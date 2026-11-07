@@ -7,7 +7,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Uvicorn-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite%20%2B%20TS-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
-[![Tailscale](https://img.shields.io/badge/Security-Tailscale%20Private%20Mesh-4B2354?style=for-the-badge&logo=tailscale)](https://tailscale.com)
 
 ---
 
@@ -17,9 +16,8 @@
 - [Dashboards & Views](#-dashboards--views)
 - [Key Performance Indicators (KPIs) & Metrics](#-key-performance-indicators-kpis--metrics)
 - [AI Intelligence Engine (BYOK — Bring Your Own Key)](#-ai-intelligence-engine-byok--bring-your-own-key)
-- [Architecture & Decoupled Deployment](#-architecture--decoupled-deployment)
 - [Local Setup & Development Guide](#-local-setup--development-guide)
-- [Deploying to Raspberry Pi / Home Server](#-deploying-to-raspberry-pi--home-server)
+- [Docker Deployment](#-docker-deployment)
 - [Deploying the Frontend to GitHub Pages](#-deploying-the-frontend-to-github-pages)
 - [Security & Privacy Engineering](#-security--privacy-engineering)
 
@@ -53,8 +51,8 @@ The platform includes six dedicated modules accessible from the navigation bar:
   - **Hyperscalers & Frontier Labs**: Microsoft, Alphabet/Google DeepMind, Amazon AWS, Meta.
   - **AI Enterprise & Software**: Palantir, Snowflake, Oracle, ServiceNow.
   - **Data Center Power, Cooling & Infrastructure**: Vertiv, Eaton, Constellation Energy, Vistra, Schneider Electric.
-  - **Indian Server & IT OEMs**: Tata Elxsi, L&T Technology, Dixon Technologies, Netweb Technologies.
-- **Dispatches Stream**: Categorized live feed covering Model Releases, Cybersecurity & Jailbreak Vulnerabilities, and Grid Infrastructure Capex.
+  - **Server & IT OEMs**: Dixon Technologies, Netweb Technologies, Tata Elxsi, L&T Technology.
+- **Dispatches Stream**: Categorized live feed covering Model Releases, Cybersecurity & Vulnerabilities, and Grid Infrastructure Capex.
 
 ### 3. Dynamic Heatmap Treemap (`/heatmap`)
 - **Two-Tier Squarified Treemap**: Visual representation of index constituents sized proportionally by market capitalization or volume.
@@ -123,11 +121,11 @@ The dashboard features an enterprise-grade AI synthesis pipeline that operates u
 
 ### Supported Providers
 Any **OpenAI-compatible HTTP endpoint** can be used by providing its base URL, API key, and model name:
-- **FreeLLMAPI** (Default local setup)
 - **OpenAI** (`https://api.openai.com/v1` — `gpt-4o`, `gpt-4o-mini`)
 - **Groq** (`https://api.groq.com/openai/v1` — `llama-3.3-70b-versatile`, `mixtral-8x7b-32768`)
-- **Ollama / vLLM / Local AI** (`http://localhost:11434/v1` or `http://100.x.y.z:8000/v1`)
+- **Ollama / vLLM / Local Self-Hosted LLMs** (`http://localhost:11434/v1` or custom port)
 - **OpenRouter** (`https://openrouter.ai/api/v1`)
+- **FreeLLMAPI**
 
 ### Master AI Toggle `[✨ AI: ON / OFF]`
 Located prominently in the top header, inside the asset detail modal, and in the AI Supercycle tab:
@@ -138,60 +136,11 @@ Located prominently in the top header, inside the asset detail modal, and in the
   - Badge displays: `AI LLM (<model>) + Live News Wire`.
 
 - **When AI is OFF (Instant Heuristic Mode)**:
-  - **Zero External API Tokens**: Completely skips network calls to FreeLLMAPI or external LLM providers.
+  - **Zero External API Tokens**: Completely skips network calls to external LLM providers.
   - **Instant Execution (<10ms)**: Immediately uses the deterministic **Heuristic Pattern & News Synthesis Engine**.
   - Generates catalyst reasons, identifies candlestick geometry, and constructs fundamental SWOT vectors algorithmically.
   - Badge displays: `Heuristic News Synthesis Engine (Zero API Tokens)`.
   - Your state preference is remembered across sessions via `localStorage`.
-
----
-
-## 🏗️ Architecture & Decoupled Deployment
-
-The application is architected with complete decoupling between static client assets and server-side compute:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   CLIENT (Web Browser)                      │
-│   Accessed via: https://rororathod.github.io/financial-dashboard │
-│   - React 18 SPA + Vite                                     │
-│   - Hash Router (createHashRouter)                          │
-│   - Automatic Candidate API Probing                         │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-            Private Mesh Calls │ (HTTPS / Let's Encrypt TLS)
-                               │ [Tailnet Only - Funnel Disabled]
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│            BACKEND HARDWARE (e.g. Raspberry Pi)             │
-│   Tailscale Hostname: roro.tail4f92aa.ts.net (100.83.231.3) │
-│                                                             │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │ Tailscale Serve (Port 443)                          │   │
-│   │ - Automatic Let's Encrypt TLS Certificate           │   │
-│   │ - Private Network Access (PNA) Headers Enabled      │   │
-│   │ - Proxies to Local Port 8000                        │   │
-│   └──────────────────────────┬──────────────────────────┘   │
-│                              ▼                              │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │ Container: financial-backend (FastAPI + Uvicorn)    │   │
-│   │ - 3 Worker Processes                                │   │
-│   │ - 300s TTL Memory Cache                             │   │
-│   │ - Yahoo Finance & Live RSS Parser                   │   │
-│   │ - Algorithmic Heuristic Fallback Engine             │   │
-│   └──────────────────────────┬──────────────────────────┘   │
-│                              │ Internal HTTP (3001)         │
-│                              ▼                              │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │ Container: freellmapi / BYOK LLM Provider           │   │
-│   └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Why Decoupled?
-1. **Zero Pi Resource Waste**: The Raspberry Pi does not waste CPU cycles, memory, or bandwidth serving static frontend JavaScript and CSS bundles. GitHub's global CDN serves the frontend for free.
-2. **Private Network Security**: The backend is hosted on your local hardware behind a private **Tailscale** mesh. Port 8000 is never exposed to the public internet (Funnel is completely disabled). Only devices authenticated to your personal Tailnet can reach the API.
-3. **Private Network Access (PNA) Compliant**: Modern Chromium/Brave browsers enforce strict PNA checks when public websites (`github.io`) call intranet addresses. The backend explicitly returns `Access-Control-Allow-Private-Network: true` on preflights.
 
 ---
 
@@ -229,10 +178,10 @@ Edit `backend/.env` with your settings:
 PORT=8000
 CACHE_TTL_SECONDS=300
 
-# BYOK AI Configuration (OpenAI, Groq, Ollama, FreeLLMAPI)
-OPENAI_API_BASE=http://127.0.0.1:3001/v1
+# BYOK AI Configuration (OpenAI, Groq, Ollama, OpenRouter, etc.)
+OPENAI_API_BASE=https://api.openai.com/v1
 OPENAI_API_KEY=your-api-key-here
-OPENAI_MODEL=auto
+OPENAI_MODEL=gpt-4o-mini
 ```
 
 Start the backend:
@@ -255,43 +204,30 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 🍓 Deploying to Raspberry Pi / Home Server
+## 🐳 Docker Deployment
 
-You can run the backend as a lightweight Docker container on a Raspberry Pi or any Linux server:
+You can run the backend as a lightweight Docker container on any machine or server:
 
-### 1. Run with Docker
 ```bash
 cd backend
 
 # Build Docker image
 docker build -t financial-dashboard-backend:latest .
 
-# Run container with host network
+# Run container
 docker run -d \
   --name financial-backend \
   --restart unless-stopped \
-  --network host \
+  -p 8000:8000 \
   --env-file .env \
   financial-dashboard-backend:latest
-```
-
-### 2. Enable Tailscale Serve (Private HTTPS)
-To allow your browser on GitHub Pages to connect without Mixed Content errors:
-```bash
-# Start background HTTPS proxy on port 443
-sudo tailscale serve --bg 8000
-```
-Verify the status:
-```bash
-tailscale serve status
-# Outputs: https://<node-name>.<tailnet>.ts.net (tailnet only) -> http://127.0.0.1:8000
 ```
 
 ---
 
 ## 🌐 Deploying the Frontend to GitHub Pages
 
-The frontend is deployed to GitHub Pages using automated git tree pushes:
+The frontend can be deployed statically to GitHub Pages:
 
 ```bash
 cd frontend
@@ -307,7 +243,7 @@ cd ..
 git subtree push --prefix frontend/dist origin gh-pages
 ```
 
-Your dashboard will be instantly live at:
+The frontend will be served at:
 `https://<your-username>.github.io/financial-dashboard/`
 
 ---
@@ -317,13 +253,9 @@ Your dashboard will be instantly live at:
 1. **Zero Secret Leakage**:
    - The public GitHub repository contains **strictly zero** API keys, passwords, or personal IP addresses.
    - All LLM credentials and environment files (`.env`) are ignored via `.gitignore`.
-2. **Tailnet-Only Ingress**:
-   - The Raspberry Pi backend runs with **Tailscale Funnel OFF**.
-   - No open ports exist on public routers. Zero DDoS or scanning exposure.
-3. **CORS & Preflight Compliance**:
-   - Implements full cross-origin resource sharing headers allowing only your GitHub Pages origin or local dev instances.
-   - Responds to `Access-Control-Request-Private-Network` to satisfy browser security standards.
-4. **Privacy-Preserving Portfolio**:
+2. **CORS & Preflight Compliance**:
+   - Implements full cross-origin resource sharing headers allowing only your configured frontend origin or local dev instances.
+3. **Privacy-Preserving Portfolio**:
    - Watchlist and portfolio positions are saved strictly in the user's browser `localStorage`. No personal financial holdings are transmitted or stored on external databases.
 
 ---
@@ -331,4 +263,4 @@ Your dashboard will be instantly live at:
 ## 📜 License
 
 Distributed under the **MIT License**. Free for personal, academic, and non-commercial development.
-Market data sourced via institutional public quote endpoints for analytical and educational use.
+Market data sourced via public quote endpoints for analytical and educational use.
