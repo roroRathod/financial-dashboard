@@ -309,7 +309,7 @@ async def ai_summary(req: SummaryRequest):
     timeframe = req.data.get("timeframe", "1D")
     use_llm = req.use_llm if req.use_llm is not None else req.data.get("use_llm", True)
 
-    news = _fetch_related_news(query, limit=6)
+    news = await asyncio.to_thread(_fetch_related_news, query, 6)
 
     # 1. Try Primary Method: OpenAI-Compatible LLM (only if use_llm is True)
     llm_result = None

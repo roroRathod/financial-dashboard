@@ -2,6 +2,7 @@ import os
 import re
 import json
 import logging
+import asyncio
 from typing import Optional
 from fastapi import APIRouter
 import feedparser
@@ -186,7 +187,7 @@ Provide an executive intelligence briefing in strictly valid JSON format with th
 @router.get("/intelligence")
 async def get_ai_intelligence(use_llm: bool = True):
     """Returns real-time AI world events (hacks, releases, geopolitics) and executive market summary."""
-    news = _fetch_ai_world_news(limit=10)
+    news = await asyncio.to_thread(_fetch_ai_world_news, 10)
 
     # Calculate average return of key bellwethers
     bellwethers = ["NVDA", "MSFT", "GOOGL", "TSM"]
