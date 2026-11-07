@@ -19,6 +19,8 @@
 - [Compatible Models Matrix](#-compatible-models-matrix)
 - [Local Setup & Development Guide](#-local-setup--development-guide)
 - [Docker Deployment](#-docker-deployment)
+- [🔮 Future Roadmap & Feature Checklist](#-future-roadmap--feature-checklist)
+- [🤝 Contributing](#-contributing)
 - [Security Engineering](#-security-engineering)
 
 ---
@@ -242,6 +244,57 @@ docker run -d \
   --env-file .env \
   financial-dashboard-backend:latest
 ```
+
+---
+
+## 🔮 Future Roadmap & Feature Checklist
+
+We welcome community collaboration to expand the analytical depth of the dashboard. Below is our upcoming milestone checklist:
+
+- [ ] **Balance Sheet Extraction & AI Health Audit**:
+  - Automated retrieval of annual and quarterly financial statements (Total Debt, Cash & Equivalents, Free Cash Flow, Debt-to-Equity, Operating Margins).
+  - AI engine synthesizes raw balance sheet metrics alongside breaking company news to explain financial health in plain, institutional English.
+- [ ] **Earnings Call & Performance Dissection**:
+  - Automated transcript summarization of quarterly earnings calls, guidance revisions, management commentary, and revenue/EBITDA beats & misses contextualized against market reactions.
+- [ ] **Context-Augmented Financial Assistant / FAQ Chatbot (AI Feature)**:
+  - An embedded, lightweight interactive financial copilot.
+  - **Page-Aware Augmentation**: When opened, the assistant automatically knows your active view (e.g., inspecting a specific stock's Candlestick modal, viewing the Screener, or scanning Commodities) so you can ask *"Why is this dipping today?"* or *"Explain this debt ratio"* without manual context copying.
+- [ ] **Multi-Factor Trend Analysis & Forward Projections (AI Feature)**:
+  - Advanced forward-looking scenario modeling blending balance sheet health, earnings call guidance, technical pivot geometry, and macroeconomic news wire catalysts.
+  - Generates probabilistic trend outlooks backed by transparent, step-by-step institutional reasoning.
+
+---
+
+## 🤝 Contributing
+
+Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+### ⚠️ Protected Main Branch Notice
+> **Important**: Direct pushes to the `main` branch are strictly prohibited. All changes must be submitted via **Fork and Pull Request (PR)** for review and CI verification.
+
+### Submission Steps:
+1. **Fork the Project** by clicking the Fork button at the top right of this repository.
+2. **Clone your fork locally**:
+   ```bash
+   git clone https://github.com/<your-username>/financial-dashboard.git
+   cd financial-dashboard
+   ```
+3. **Create your Feature Branch**:
+   ```bash
+   git checkout -b feature/YourFeatureName
+   ```
+4. **Commit your Changes**:
+   ```bash
+   git commit -m "feat: implement Balance Sheet extraction"
+   ```
+5. **Push to your Branch**:
+   ```bash
+   git push origin feature/YourFeatureName
+   ```
+6. **Open a Pull Request**:
+   - Go to your fork on GitHub and click **Compare & pull request**.
+   - Provide a clear summary of your changes and test coverage.
+   - Ensure strictly **zero secrets, credentials, or private host addresses** are committed.
 
 ---
 
