@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #f7f5ef;
+    --card-main: #ffffff;
+    --border-main: #e5e1d8;
+    --text-primary: #191716;
+    --text-muted: #78716c;
+    --logo-color: #1b4313;
+  }
+
+  .dark {
+    --bg-main: #090d16;
+    --card-main: #0f1523;
+    --border-main: #1c2538;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --logo-color: #b7eb4d;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    @apply antialiased transition-colors duration-150;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Completely remove ugly default browser scrollbars while keeping smooth scrolling */
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+    background: transparent !important;
+  }
+}
+
+/* Utilities for hidden scrollbars */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Clean unslop card styling */
+.unslop-card {
+  @apply bg-white border border-stone-200 dark:bg-slate-900 dark:border-slate-800 rounded-xl shadow-none;
+}

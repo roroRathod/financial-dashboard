@@ -1,0 +1,12 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      - CACHE_TTL_SECONDS=60
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+             python app/mcp_server.py"
+    restart: unless-stopped

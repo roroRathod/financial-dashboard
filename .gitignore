@@ -1,0 +1,56 @@
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Backend User Data (Portfolios / Private Watchlists)
+backend/data/*.json
+!backend/data/.gitkeep
+
+# Node & Frontend
+node_modules/
+frontend/dist/
+frontend/src_backup_*/
+.eslintcache
+*.tsbuildinfo
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
