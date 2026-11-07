@@ -345,34 +345,7 @@ We welcome community collaboration to expand the analytical depth of the dashboa
 
 ## 🤝 Contributing
 
-Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-### ⚠️ Protected Main Branch Notice
-> **Important**: Direct pushes to the `main` branch are strictly prohibited. All changes must be submitted via **Fork and Pull Request (PR)** for review and CI verification.
-
-### Submission Steps:
-1. **Fork the Project** by clicking the Fork button at the top right of this repository.
-2. **Clone your fork locally**:
-   ```bash
-   git clone https://github.com/<your-username>/financial-dashboard.git
-   cd financial-dashboard
-   ```
-3. **Create your Feature Branch**:
-   ```bash
-   git checkout -b feature/YourFeatureName
-   ```
-4. **Commit your Changes**:
-   ```bash
-   git commit -m "feat: implement Balance Sheet extraction"
-   ```
-5. **Push to your Branch**:
-   ```bash
-   git push origin feature/YourFeatureName
-   ```
-6. **Open a Pull Request**:
-   - Go to your fork on GitHub and click **Compare & pull request**.
-   - Provide a clear summary of your changes and test coverage.
-   - Ensure strictly **zero secrets, credentials, or private host addresses** are committed.
+Contributions to expand analytical models, indicators, or performance optimizations are welcome. Please open an issue or submit a pull request.
 
 ---
 
