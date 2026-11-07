@@ -53,9 +53,14 @@ export function TailscaleStatusModal({ isOpen, onClose, onSuccess }: Props) {
           </p>
 
           {retryFailed && (
-            <div className="text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center justify-center gap-1.5 pt-1">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              Still offline. Ensure Tailscale is active and try again.
+            <div className="space-y-2 pt-1 text-left">
+              <div className="text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center justify-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                <span>Could not reach Pi backend over Tailscale.</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed">
+                <strong>Brave Browser User?</strong> Click the orange <strong>Lion icon</strong> in your address bar and toggle <strong>Brave Shields OFF</strong> for this site, as Brave blocks cross-site intranet connections by default.
+              </div>
             </div>
           )}
         </div>

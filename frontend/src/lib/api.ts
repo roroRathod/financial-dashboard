@@ -1,13 +1,18 @@
 import axios from 'axios'
 
-const getBaseUrl = () => {
+const CANDIDATE_URLS = [
+  'https://roro.tail4f92aa.ts.net',
+  'http://100.83.231.3:8000',
+  'http://localhost:8000',
+]
+
+const getInitialBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // If running on GitHub Pages, connect over HTTPS to Pi via Tailscale
+    const saved = localStorage.getItem('roro_backend_url')
+    if (saved) return saved
     if (window.location.hostname === 'rororathod.github.io') {
-      const saved = localStorage.getItem('roro_backend_url')
-      return saved || 'https://roro.tail4f92aa.ts.net'
+      return 'https://roro.tail4f92aa.ts.net'
     }
-    // If running on Pi directly or local network
     if (window.location.port === '8000' || window.location.hostname.includes('tail4f92aa.ts.net')) {
       return ''
     }
@@ -15,19 +20,50 @@ const getBaseUrl = () => {
   return import.meta.env.VITE_API_BASE || 'http://localhost:8000'
 }
 
-const API = getBaseUrl()
+let activeBaseUrl = getInitialBaseUrl()
 
 export const api = axios.create({
-  baseURL: API,
+  baseURL: activeBaseUrl,
   timeout: 12000,
 })
 
-export const checkBackendHealth = async (): Promise<{ ok: boolean; error?: string }> => {
+export const setApiBaseUrl = (url: string) => {
+  activeBaseUrl = url
+  api.defaults.baseURL = url
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('roro_backend_url', url)
+  }
+}
+
+export const checkBackendHealth = async (): Promise<{ ok: boolean; activeUrl?: string; error?: string }> => {
+  // If the activeBaseUrl already works, check it first
   try {
     const res = await api.get('/health', { timeout: 3500 })
-    return { ok: res.status === 200 }
-  } catch (err: any) {
-    return { ok: false, error: err?.message || 'Connection timed out' }
+    if (res.status === 200) {
+      return { ok: true, activeUrl: activeBaseUrl }
+    }
+  } catch (err) {
+    // If current fails, probe candidate URLs
+  }
+
+  // Probe candidates
+  for (const url of CANDIDATE_URLS) {
+    if (url === activeBaseUrl) continue
+    try {
+      const probeClient = axios.create({ baseURL: url, timeout: 3000 })
+      const res = await probeClient.get('/health')
+      if (res.status === 200) {
+        setApiBaseUrl(url)
+        return { ok: true, activeUrl: url }
+      }
+    } catch {
+      // Continue to next candidate
+    }
+  }
+
+  return {
+    ok: false,
+    error: 'Could not reach backend on https://roro.tail4f92aa.ts.net or http://100.83.231.3:8000.',
   }
 }
 
