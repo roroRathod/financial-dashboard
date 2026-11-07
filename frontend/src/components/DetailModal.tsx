@@ -35,9 +35,17 @@ type DetailModalProps = {
   } | null
   onClose: () => void
   initialTimeframe?: string
+  aiEnabled?: boolean
+  onToggleAi?: () => void
 }
 
-export function DetailModal({ asset, onClose, initialTimeframe = '1D' }: DetailModalProps) {
+export function DetailModal({
+  asset,
+  onClose,
+  initialTimeframe = '1D',
+  aiEnabled = true,
+  onToggleAi,
+}: DetailModalProps) {
   const [timeframe, setTimeframe] = useState(initialTimeframe)
   const [chartType, setChartType] = useState<'area' | 'candle'>('candle')
   const [historyData, setHistoryData] = useState<any[]>([])
@@ -93,13 +101,14 @@ export function DetailModal({ asset, onClose, initialTimeframe = '1D' }: DetailM
         // Trigger Candlestick AI technical analysis
         if (rows.length >= 3) {
           setCandleAiLoading(true)
-          fetchCandlestickAi({ ticker: asset.ticker, name: asset.name, candles: rows })
+          fetchCandlestickAi({ ticker: asset.ticker, name: asset.name, candles: rows, use_llm: aiEnabled })
             .then((cRes) => setCandlestickAi(cRes))
             .catch(() => {
               setCandlestickAi({
                 patterns: ['Multi-bar session range consolidation'],
                 sentiment: 'Constructive Consolidation',
                 analysis: 'Price action is compressing within intermediate Bollinger bands near pivot support.',
+                source: 'Heuristic Candlestick Pattern Engine',
               })
             })
             .finally(() => setCandleAiLoading(false))
@@ -109,18 +118,21 @@ export function DetailModal({ asset, onClose, initialTimeframe = '1D' }: DetailM
         setHistoryData([])
       })
       .finally(() => setLoadingHistory(false))
-  }, [asset, timeframe])
+  }, [asset, timeframe, aiEnabled])
 
   // Automatically trigger AI analysis & news on asset open
   useEffect(() => {
     if (!asset) return
     const currentChange = asset.periods?.[timeframe] ?? asset.periods?.['1D'] ?? 0
     setAiLoading(true)
-    aiSummary({
-      asset_class: asset.name,
-      region: 'INDIA',
-      data: { ticker: asset.ticker, price: asset.price, change: currentChange, timeframe },
-    })
+    aiSummary(
+      {
+        asset_class: asset.name,
+        region: 'INDIA',
+        data: { ticker: asset.ticker, price: asset.price, change: currentChange, timeframe },
+      },
+      aiEnabled,
+    )
       .then((res) => setAiData(res))
       .catch(() => {
         setAiData({
@@ -134,10 +146,11 @@ export function DetailModal({ asset, onClose, initialTimeframe = '1D' }: DetailM
             opportunities: ['Technical breakout targeting immediate resistance', 'Domestic demand growth'],
             threats: ['Sector rotation risk', 'Foreign institutional flow volatility'],
           },
+          source: 'Heuristic News Synthesis Engine (Zero API Tokens)',
         })
       })
       .finally(() => setAiLoading(false))
-  }, [asset, timeframe])
+  }, [asset, timeframe, aiEnabled])
 
   if (!asset) return null
 
@@ -338,10 +351,31 @@ export function DetailModal({ asset, onClose, initialTimeframe = '1D' }: DetailM
           {/* Reason For Move Card */}
           <div className="bg-stone-50 dark:bg-[#0e1726] border border-stone-200 dark:border-slate-800 rounded-xl p-4 sm:p-5">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-200 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-[#b7eb4d]" />
+              <div className="flex flex-wrap items-center gap-2">
+                <Sparkles className={cn('w-4 h-4', aiEnabled ? 'text-emerald-600 dark:text-[#b7eb4d]' : 'text-stone-400')} />
                 <h3 className="font-semibold text-sm">Reason For Move ({timeframe})</h3>
+                {aiData?.source && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-md font-mono bg-stone-200/80 dark:bg-slate-800 text-stone-600 dark:text-slate-400 border border-stone-300/60 dark:border-slate-700/60">
+                    {aiData.source}
+                  </span>
+                )}
               </div>
+              {onToggleAi && (
+                <button
+                  type="button"
+                  onClick={onToggleAi}
+                  className={cn(
+                    'px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-colors flex items-center gap-1.5',
+                    aiEnabled
+                      ? 'bg-[#b7eb4d]/15 text-[#5e7f17] dark:text-[#b7eb4d] border-[#b7eb4d]/40 hover:bg-[#b7eb4d]/25'
+                      : 'bg-stone-200/70 dark:bg-slate-800 text-stone-500 dark:text-slate-400 border-stone-300 dark:border-slate-700 hover:text-stone-700 dark:hover:text-slate-300',
+                  )}
+                  title={aiEnabled ? 'AI Active (FreeLLMAPI) - Click to disable' : 'AI Disabled (Heuristic Only) - Click to enable'}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>AI: {aiEnabled ? 'ON' : 'OFF'}</span>
+                </button>
+              )}
             </div>
 
             {aiLoading ? (

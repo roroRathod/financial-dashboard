@@ -184,7 +184,7 @@ Provide an executive intelligence briefing in strictly valid JSON format with th
 
 
 @router.get("/intelligence")
-async def get_ai_intelligence():
+async def get_ai_intelligence(use_llm: bool = True):
     """Returns real-time AI world events (hacks, releases, geopolitics) and executive market summary."""
     news = _fetch_ai_world_news(limit=10)
 
@@ -197,15 +197,17 @@ async def get_ai_intelligence():
             returns.append(q["change_pct"])
     avg_return = sum(returns) / len(returns) if returns else 0.85
 
-    # 1. Try Primary Method: OpenAI-Compatible LLM
-    llm_briefing = await _summarize_ai_world_with_llm(news, avg_return)
+    # 1. Try Primary Method: OpenAI-Compatible LLM (only if use_llm is True)
+    llm_briefing = None
+    if use_llm:
+        llm_briefing = await _summarize_ai_world_with_llm(news, avg_return)
 
     if llm_briefing:
         briefing = llm_briefing
         source = f"AI LLM ({DEFAULT_CONFIG.get('model', 'auto')}) + Live Global Tech Wire"
         is_llm = True
     else:
-        # 2. Seamless Fallback Heuristic
+        # 2. Seamless Fast Fallback Heuristic (Zero API calls)
         top_model_event = next((n["title"] for n in news if n["tag"] == "🚀 Model & Breakthrough"), "Next-gen frontier models expand enterprise deployment")
         top_security_event = next((n["title"] for n in news if n["tag"] == "⚠️ Security / Breach"), "Cybersecurity firms respond to evolving AI jailbreak and vulnerability reports")
         top_power_event = next((n["title"] for n in news if n["tag"] == "⚡ Power & Infrastructure"), "Hyperscalers secure dedicated long-term energy for next-generation AI clusters")
@@ -227,7 +229,7 @@ async def get_ai_intelligence():
                 f"Infrastructure & Power: {top_power_event}",
             ],
         }
-        source = "Live AI Event Synthesizer (Algorithmic Fallback)"
+        source = "Heuristic AI Event Synthesizer (Instant / Zero API Tokens)" if not use_llm else "Live AI Event Synthesizer (Algorithmic Fallback)"
         is_llm = False
 
     return {

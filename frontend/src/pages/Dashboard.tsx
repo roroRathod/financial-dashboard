@@ -10,6 +10,7 @@ import {
   Sun,
   Moon,
   Radio,
+  Sparkles,
 } from 'lucide-react'
 import { MarketCard } from '../components/MarketCard'
 import { NewsGrid } from '../components/NewsGrid'
@@ -43,6 +44,19 @@ export function Dashboard() {
   const [fx, setFx] = useState<any>({})
   const [news, setNews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Master AI Analysis Toggle (persisted to localStorage)
+  const [aiEnabled, setAiEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('roro_ai_enabled') !== 'false'
+  })
+
+  const toggleAi = () => {
+    setAiEnabled((prev) => {
+      const next = !prev
+      localStorage.setItem('roro_ai_enabled', String(next))
+      return next
+    })
+  }
 
   // Navigation & View State
   const [activeTab, setActiveTab] = useState<DashboardTab>('markets')
@@ -203,6 +217,26 @@ export function Dashboard() {
               </button>
             ))}
           </div>
+
+          {/* AI Analysis Master Toggle */}
+          <button
+            type="button"
+            onClick={toggleAi}
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all',
+              aiEnabled
+                ? 'bg-[#b7eb4d]/15 text-[#5e7f17] dark:text-[#b7eb4d] border-[#b7eb4d]/40 hover:bg-[#b7eb4d]/25'
+                : 'bg-white dark:bg-slate-900 text-stone-500 dark:text-slate-400 border-stone-200 dark:border-slate-800 hover:text-stone-700 dark:hover:text-slate-300',
+            )}
+            title={
+              aiEnabled
+                ? 'AI Engine ON: Generating institutional synthesis via FreeLLMAPI'
+                : 'AI Engine OFF: Zero external API calls (instant algorithmic heuristic engine)'
+            }
+          >
+            <Sparkles className={cn('w-3.5 h-3.5', aiEnabled ? 'text-emerald-600 dark:text-[#b7eb4d]' : 'text-stone-400')} />
+            <span>AI: {aiEnabled ? 'ON' : 'OFF'}</span>
+          </button>
 
           {/* Desktop Theme Switcher */}
           <button
@@ -481,6 +515,8 @@ export function Dashboard() {
           timeframe={timeframe}
           onSelectStock={(s) => setSelectedAsset(s)}
           onOpenConfig={() => {}}
+          aiEnabled={aiEnabled}
+          onToggleAi={toggleAi}
         />
       )}
 
@@ -631,6 +667,8 @@ export function Dashboard() {
           asset={selectedAsset}
           onClose={() => setSelectedAsset(null)}
           initialTimeframe={timeframe}
+          aiEnabled={aiEnabled}
+          onToggleAi={toggleAi}
         />
       )}
 

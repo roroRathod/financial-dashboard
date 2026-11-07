@@ -24,9 +24,16 @@ type AiEcosystemViewProps = {
   timeframe: Timeframe
   onSelectStock: (stock: any) => void
   onOpenConfig?: () => void
+  aiEnabled?: boolean
+  onToggleAi?: () => void
 }
 
-export function AiEcosystemView({ timeframe, onSelectStock }: AiEcosystemViewProps) {
+export function AiEcosystemView({
+  timeframe,
+  onSelectStock,
+  aiEnabled = true,
+  onToggleAi,
+}: AiEcosystemViewProps) {
   const [intel, setIntel] = useState<any>(null)
   const [stocks, setStocks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +46,7 @@ export function AiEcosystemView({ timeframe, onSelectStock }: AiEcosystemViewPro
   const loadData = () => {
     setLoading(true)
     Promise.all([
-      fetchAiIntelligence().catch(() => null),
+      fetchAiIntelligence(aiEnabled).catch(() => null),
       fetchAiStocks().catch(() => ({ stocks: [] })),
     ]).then(([intelRes, stocksRes]) => {
       setIntel(intelRes)
@@ -50,7 +57,7 @@ export function AiEcosystemView({ timeframe, onSelectStock }: AiEcosystemViewPro
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [aiEnabled])
 
   const categories = useMemo(() => {
     const set = new Set(stocks.map((s) => s.category).filter(Boolean))
@@ -131,6 +138,22 @@ export function AiEcosystemView({ timeframe, onSelectStock }: AiEcosystemViewPro
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
+            {onToggleAi && (
+              <button
+                type="button"
+                onClick={onToggleAi}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all',
+                  aiEnabled
+                    ? 'bg-[#b7eb4d]/15 text-[#5e7f17] dark:text-[#b7eb4d] border-[#b7eb4d]/40 hover:bg-[#b7eb4d]/25'
+                    : 'bg-stone-100 dark:bg-slate-800 text-stone-500 dark:text-slate-400 border-stone-200 dark:border-slate-700 hover:text-stone-700 dark:hover:text-slate-300',
+                )}
+                title={aiEnabled ? 'AI LLM Synthesis Active - Click to switch to Heuristic Engine' : 'Heuristic Engine (0 API Tokens) Active - Click to enable LLM'}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>AI: {aiEnabled ? 'ON' : 'OFF'}</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={loadData}

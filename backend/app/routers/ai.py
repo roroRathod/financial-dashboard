@@ -287,6 +287,7 @@ class SummaryRequest(BaseModel):
     asset_class: str
     region: str = "INDIA"
     data: dict = {}
+    use_llm: Optional[bool] = True
 
 
 @router.post("/summary")
@@ -306,11 +307,14 @@ async def ai_summary(req: SummaryRequest):
 
     change_pct = float(req.data.get("change", 0.0) or 0.0)
     timeframe = req.data.get("timeframe", "1D")
+    use_llm = req.use_llm if req.use_llm is not None else req.data.get("use_llm", True)
 
     news = _fetch_related_news(query, limit=6)
 
-    # 1. Try Primary Method: OpenAI-Compatible LLM
-    llm_result = await _call_openai_llm(req.asset_class, ticker, change_pct, timeframe, news)
+    # 1. Try Primary Method: OpenAI-Compatible LLM (only if use_llm is True)
+    llm_result = None
+    if use_llm:
+        llm_result = await _call_openai_llm(req.asset_class, ticker, change_pct, timeframe, news)
 
     if llm_result:
         reason = llm_result.get("reason_for_move")
@@ -318,9 +322,9 @@ async def ai_summary(req: SummaryRequest):
         source = f"AI LLM ({DEFAULT_CONFIG.get('model', 'auto')}) + Live News Wire"
         is_llm = True
     else:
-        # 2. Seamless Fallback: Algorithmic Heuristic News Synthesis
+        # 2. Fast Fallback: Algorithmic Heuristic News Synthesis (Zero LLM tokens)
         reason, swot = _generate_reason_and_swot(req.asset_class, ticker, change_pct, timeframe, news)
-        source = "Live News Synthesis Engine (Algorithmic Fallback)"
+        source = "Heuristic News Synthesis Engine (Zero API Tokens)" if not use_llm else "Live News Synthesis Engine (Algorithmic Fallback)"
         is_llm = False
 
     return {
@@ -389,6 +393,7 @@ class CandlestickRequest(BaseModel):
     ticker: str
     name: Optional[str] = None
     candles: list = []
+    use_llm: Optional[bool] = True
 
 
 @router.post("/candlestick")
@@ -491,10 +496,12 @@ async def analyze_candlestick(req: CandlestickRequest):
         )
         sentiment = "Bullish" if is_bullish else "Bearish"
 
-    # LLM-based technical analysis if configured
+    # LLM-based technical analysis if configured and enabled
     api_key = DEFAULT_CONFIG.get("api_key", "").strip()
     llm_analysis = None
-    if api_key:
+    use_llm = req.use_llm if req.use_llm is not None else True
+
+    if use_llm and api_key:
         try:
             base_url = DEFAULT_CONFIG.get("base_url", "https://api.openai.com/v1").rstrip("/")
             model = DEFAULT_CONFIG.get("model", "auto") or "auto"
@@ -535,5 +542,5 @@ Provide a 2-sentence institutional technical trading summary: key trigger level,
         "support": round(support, 2),
         "resistance": round(resistance, 2),
         "analysis": llm_analysis,
-        "source": "LLM Technical Engine" if api_key and llm_analysis else "Heuristic Candlestick Pattern Engine",
+        "source": "LLM Technical Engine" if use_llm and api_key and llm_analysis else "Heuristic Candlestick Pattern Engine",
     }
