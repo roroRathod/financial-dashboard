@@ -14,9 +14,9 @@ router = APIRouter()
 
 # OpenAI-Compatible Configuration (supports custom base_url, api_key, model)
 DEFAULT_CONFIG = {
-    "base_url": os.getenv("LLM_BASE_URL", "https://api.openai.com/v1"),
-    "api_key": os.getenv("LLM_API_KEY", ""),
-    "model": os.getenv("LLM_MODEL", "auto"),
+    "base_url": os.getenv("OPENAI_API_BASE") or os.getenv("LLM_BASE_URL", "https://api.openai.com/v1"),
+    "api_key": os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY", ""),
+    "model": os.getenv("OPENAI_MODEL") or os.getenv("LLM_MODEL", "auto"),
 }
 
 # Clean ticker name map to real corporate query
