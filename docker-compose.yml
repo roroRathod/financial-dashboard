@@ -3,37 +3,38 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: financial-dashboard-backend
     ports:
       - "8000:8000"
     environment:
-      - CACHE_TTL_SECONDS=60
-      - LLM_BASE_URL=${LLM_BASE_URL:-https://api.openai.com/v1}
-      - LLM_API_KEY=${LLM_API_KEY:-}
-      - LLM_MODEL=${LLM_MODEL:-auto}
+      - PORT=8000
+      - CACHE_TTL_SECONDS=300
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-${LLM_BASE_URL:-http://localhost:3001/v1}}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-${LLM_API_KEY:-}}
+      - OPENAI_MODEL=${OPENAI_MODEL:-${LLM_MODEL:-auto}}
+    env_file:
+      - path: ./backend/.env
+        required: false
     dns:
       - 8.8.8.8
       - 1.1.1.1
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    volumes:
-      - ./backend:/app
-      - /app/.venv
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: financial-dashboard-frontend
     ports:
       - "5173:5173"
     environment:
       - VITE_API_BASE=http://localhost:8000
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-    command: npm run dev -- --host 0.0.0.0 --port 5173
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     depends_on:
       - backend
     restart: unless-stopped

@@ -18,7 +18,8 @@
 - [AI Intelligence Engine (BYOK — Bring Your Own Key)](#-ai-intelligence-engine-byok--bring-your-own-key)
 - [Compatible Models Matrix](#-compatible-models-matrix)
 - [Local Setup & Development Guide](#-local-setup--development-guide)
-- [Docker Deployment](#-docker-deployment)
+- [Combined Docker Compose (Single-Command Setup)](#-combined-docker-compose-single-command-setup)
+- [Production Architecture & Decoupled Deployment](#-production-architecture--decoupled-deployment)
 - [🔮 Future Roadmap & Feature Checklist](#-future-roadmap--feature-checklist)
 - [🤝 Contributing](#-contributing)
 - [Security Engineering](#-security-engineering)
@@ -226,24 +227,101 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 🐳 Docker Deployment
+## 🐳 Combined Docker Compose (Single-Command Setup)
 
-You can run the backend as a lightweight Docker container on any machine or server:
+For developers or homelab users who wish to run both the FastAPI backend and React frontend together with a single command, a root-level `docker-compose.yml` is provided:
 
+```bash
+# Clone the repository
+git clone https://github.com/roroRathod/financial-dashboard.git
+cd financial-dashboard
+
+# Build and start all services in detached mode
+docker compose up --build -d
+```
+
+This starts:
+- **Backend Service** at `http://localhost:8000` (FastAPI Swagger documentation at `http://localhost:8000/docs`).
+- **Frontend SPA** at `http://localhost:5173`.
+
+To stop the services:
+```bash
+docker compose down
+```
+
+---
+
+## 🏗️ Production Architecture & Decoupled Deployment
+
+In production environments, the platform is intentionally architected with **completely decoupled deployment strategies** for compute vs. static assets:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GLOBAL EDGE / STATIC CDN                     │
+│   (e.g., AWS S3 + CloudFront / Cloudflare R2 / GitHub Pages)    │
+│   - Pure static client bundle (Vite + React 18 SPA)             │
+│   - Sub-50ms TTFB across edge locations                         │
+│   - Zero server CPU/RAM consumption for static asset delivery   │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ API Calls (HTTPS / TLS)
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     BACKEND COMPUTE CLUSTER                     │
+│              (e.g., Kubernetes / Docker Workloads)              │
+│   - FastAPI + Uvicorn multi-worker backend                      │
+│   - High-throughput asynchronous yfinance & RSS feed parsers    │
+│   - In-memory 300s TTL cache & algorithmic heuristic engine     │
+│   - Scaled independently based on traffic and query load        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Why Decouple Compute from Frontend?
+1. **Zero Compute Overhead**: Heavy static `.js`, `.css`, and media assets are served globally via edge CDNs or object storage buckets (S3 / Cloudflare R2 / GitHub Pages) without consuming server CPU cycles, RAM, or bandwidth.
+2. **Independent Scalability**: The Python backend can autoscale as Kubernetes pods or containerized workers purely based on API request throughput and market data load without affecting frontend availability.
+3. **Resilience**: If the backend undergoes maintenance or cold restarts, the static frontend remains accessible with informative offline states and heuristic fallbacks.
+
+### Individual Deployment Strategies
+
+#### 1. Backend: Kubernetes / Container Deployment
+The backend includes a standalone, production-ready `Dockerfile`:
 ```bash
 cd backend
 
 # Build Docker image
-docker build -t financial-dashboard-backend:latest .
+docker build -t your-registry/financial-dashboard-backend:latest .
 
-# Run container
+# Run standalone container
 docker run -d \
   --name financial-backend \
   --restart unless-stopped \
   -p 8000:8000 \
   --env-file .env \
-  financial-dashboard-backend:latest
+  your-registry/financial-dashboard-backend:latest
 ```
+For Kubernetes clusters, container images can be deployed as a standard `Deployment` with a `Service` and `Ingress` exposing the `/api` or root endpoints.
+
+#### 2. Frontend: Static CDN / Object Storage (S3, Cloudflare R2, or GitHub Pages)
+Build the production static assets:
+```bash
+cd frontend
+
+# Install dependencies and build optimized distribution
+npm install
+npm run build
+```
+The compiled output in `frontend/dist/` contains pure static HTML, JavaScript, and CSS that can be published to any static hosting provider:
+
+- **AWS S3 + CloudFront**:
+  ```bash
+  aws s3 sync dist/ s3://your-financial-dashboard-bucket/ --delete
+  ```
+- **Cloudflare R2 / Pages**:
+  Deploy via Wrangler or connect your Git repository directly to Cloudflare Pages.
+- **GitHub Pages** (Used for the live reference deployment):
+  ```bash
+  cp dist/index.html dist/404.html
+  git subtree push --prefix frontend/dist origin gh-pages
+  ```
 
 ---
 
