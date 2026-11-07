@@ -4,7 +4,7 @@ from functools import wraps
 import os
 import datetime
 
-CACHE_TTL = int(os.getenv("CACHE_TTL_SECONDS", "60"))
+CACHE_TTL = int(os.getenv("CACHE_TTL_SECONDS", "300"))
 _cache = TTLCache(maxsize=2000, ttl=CACHE_TTL)
 _client = httpx.Client(
     timeout=10,

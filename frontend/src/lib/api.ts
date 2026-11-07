@@ -24,7 +24,7 @@ let activeBaseUrl = getInitialBaseUrl()
 
 export const api = axios.create({
   baseURL: activeBaseUrl,
-  timeout: 12000,
+  timeout: 30000,
 })
 
 export const setApiBaseUrl = (url: string) => {
