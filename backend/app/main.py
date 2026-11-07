@@ -14,7 +14,6 @@ socket.setdefaulttimeout(4.0)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -29,6 +28,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_private_network=True,
 )
 
 app.include_router(markets.router, prefix="/markets", tags=["markets"])
@@ -44,10 +44,4 @@ app.include_router(investments.router, prefix="/investments", tags=["investments
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-
-# Serve built frontend if dist directory exists
-frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend_dist")
-if os.path.exists(frontend_dist):
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
 
