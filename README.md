@@ -16,10 +16,10 @@
 - [Dashboards & Views](#-dashboards--views)
 - [Key Performance Indicators (KPIs) & Metrics](#-key-performance-indicators-kpis--metrics)
 - [AI Intelligence Engine (BYOK — Bring Your Own Key)](#-ai-intelligence-engine-byok--bring-your-own-key)
+- [Compatible Models Matrix](#-compatible-models-matrix)
 - [Local Setup & Development Guide](#-local-setup--development-guide)
 - [Docker Deployment](#-docker-deployment)
-- [Deploying the Frontend to GitHub Pages](#-deploying-the-frontend-to-github-pages)
-- [Security & Privacy Engineering](#-security--privacy-engineering)
+- [Security Engineering](#-security-engineering)
 
 ---
 
@@ -76,7 +76,7 @@ The platform includes six dedicated modules accessible from the navigation bar:
 - **Historical Sparklines**: 30-day mini-charts illustrating volatility and range expansion.
 
 ### 6. Portfolio & Watchlist Tracker (`/portfolio`)
-- Real-time personal asset tracker storing entries privately in browser storage.
+- Real-time personal asset tracker storing entries in browser storage.
 - Tracks quantity, average buy price, current valuation, unrealized P&L (₹ and %), and session change.
 - One-click asset addition using global ticker search.
 
@@ -119,13 +119,13 @@ The platform includes six dedicated modules accessible from the navigation bar:
 
 The dashboard features an enterprise-grade AI synthesis pipeline that operates under a **BYOK (Bring Your Own Key)** architecture. No proprietary or closed AI endpoints are hardcoded; you have complete freedom over your inference provider.
 
-### Supported Providers
-Any **OpenAI-compatible HTTP endpoint** can be used by providing its base URL, API key, and model name:
-- **OpenAI** (`https://api.openai.com/v1` — `gpt-4o`, `gpt-4o-mini`)
-- **Groq** (`https://api.groq.com/openai/v1` — `llama-3.3-70b-versatile`, `mixtral-8x7b-32768`)
-- **Ollama / vLLM / Local Self-Hosted LLMs** (`http://localhost:11434/v1` or custom port)
-- **OpenRouter** (`https://openrouter.ai/api/v1`)
-- **FreeLLMAPI**
+### Configuration
+In your `backend/.env` file:
+```env
+OPENAI_API_BASE={your_endpoint_or_ip}
+OPENAI_API_KEY={your_api_key}
+OPENAI_MODEL={your_model_name}
+```
 
 ### Master AI Toggle `[✨ AI: ON / OFF]`
 Located prominently in the top header, inside the asset detail modal, and in the AI Supercycle tab:
@@ -141,6 +141,26 @@ Located prominently in the top header, inside the asset detail modal, and in the
   - Generates catalyst reasons, identifies candlestick geometry, and constructs fundamental SWOT vectors algorithmically.
   - Badge displays: `Heuristic News Synthesis Engine (Zero API Tokens)`.
   - Your state preference is remembered across sessions via `localStorage`.
+
+---
+
+## 🧩 Compatible Models Matrix
+
+The table below lists compatible models for the BYOK engine, including baseline capability requirements and minimum recommended parameter counts for self-hosted / open-source deployments.
+
+| Provider / Family | Base Requirement (Minimum) | Recommended Tier (Institutional Quality) | Min Parameters | JSON Mode / Schema Adherence |
+| :--- | :--- | :--- | :--- | :--- |
+| **OpenAI** | `gpt-4o-mini` | `gpt-4o`, `o1-mini`, `o3-mini` | N/A (Cloud) | Native JSON Schema / Strict |
+| **Anthropic / Claude** | `claude-3-5-haiku` | `claude-3-5-sonnet`, `claude-3-7-sonnet` | N/A (Cloud) | High |
+| **Google / Gemini** | `gemini-1.5-flash`, `gemini-2.0-flash` | `gemini-1.5-pro` | N/A (Cloud) | Native Structured Outputs |
+| **DeepSeek & East Asian** | `deepseek-chat` (V3) | `deepseek-r1`, `qwen-2.5-72b-instruct`, `glm-4-plus` | ~67B+ MoE | High |
+| **Meta Llama (Open-Source)** | `Llama-3.1-8B-Instruct` | `Llama-3.3-70B-Instruct` | **8B min** (70B recommended) | Requires prompt constraint |
+| **Alibaba Qwen (Open-Source)**| `Qwen2.5-14B-Instruct` | `Qwen2.5-32B-Instruct`, `Qwen2.5-72B` | **14B min** (32B recommended) | Excellent structured JSON |
+| **Mistral (Open-Source)** | `Mistral-7B-Instruct-v0.3` | `Mistral-Small-24B-Instruct`, `Codestral` | **7B min** (24B recommended) | Built-in JSON format support |
+
+> [!TIP]
+> **Self-Hosting / Local Inference Recommendation**:  
+> For running locally via **Ollama**, **vLLM**, or **LM Studio**, models with at least **14B to 32B parameters** (e.g. `qwen2.5:32b` or `llama3.3:70b-q4_K_M`) produce significantly more reliable SWOT matrices and deeper catalyst explanations than 8B models.
 
 ---
 
@@ -178,10 +198,10 @@ Edit `backend/.env` with your settings:
 PORT=8000
 CACHE_TTL_SECONDS=300
 
-# BYOK AI Configuration (OpenAI, Groq, Ollama, OpenRouter, etc.)
-OPENAI_API_BASE=https://api.openai.com/v1
-OPENAI_API_KEY=your-api-key-here
-OPENAI_MODEL=gpt-4o-mini
+# BYOK AI Configuration
+OPENAI_API_BASE={your_endpoint_or_ip}
+OPENAI_API_KEY={your_api_key}
+OPENAI_MODEL={your_model_name}
 ```
 
 Start the backend:
@@ -225,38 +245,15 @@ docker run -d \
 
 ---
 
-## 🌐 Deploying the Frontend to GitHub Pages
-
-The frontend can be deployed statically to GitHub Pages:
-
-```bash
-cd frontend
-
-# Build production bundle
-npm run build
-
-# Copy index.html to 404.html for SPA routing
-cp dist/index.html dist/404.html
-
-# Deploy dist folder to gh-pages branch
-cd ..
-git subtree push --prefix frontend/dist origin gh-pages
-```
-
-The frontend will be served at:
-`https://<your-username>.github.io/financial-dashboard/`
-
----
-
-## 🔒 Security & Privacy Engineering
+## 🔒 Security Engineering
 
 1. **Zero Secret Leakage**:
-   - The public GitHub repository contains **strictly zero** API keys, passwords, or personal IP addresses.
-   - All LLM credentials and environment files (`.env`) are ignored via `.gitignore`.
+   - The public GitHub repository contains **strictly zero** API keys, passwords, or personal host addresses.
+   - All credentials and environment configuration files (`.env`) are excluded via `.gitignore`.
 2. **CORS & Preflight Compliance**:
-   - Implements full cross-origin resource sharing headers allowing only your configured frontend origin or local dev instances.
-3. **Privacy-Preserving Portfolio**:
-   - Watchlist and portfolio positions are saved strictly in the user's browser `localStorage`. No personal financial holdings are transmitted or stored on external databases.
+   - Implements full cross-origin resource sharing headers allowing only your configured frontend origin or local development instances.
+3. **Pydantic Validation**:
+   - All incoming API requests are strongly typed and sanitized against injection vulnerabilities.
 
 ---
 
