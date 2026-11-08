@@ -61,7 +61,6 @@ export function CandlestickChart({
     }
     if (candles.length > 0) {
       const avg = candles[0].close
-      // Gold COMEX trades ~3500-5000 USD, while domestic 24K is ~14,000 INR/g or 140,000 INR/10g
       if (ticker.includes('GC=F') && avg < 10000) return 'USD'
     }
     return currency || 'INR'
@@ -72,10 +71,30 @@ export function CandlestickChart({
     return candles.slice(-32)
   }, [candles])
 
+  // Compute reliable auto-markup pivots (combines AI response or immediate candle price action)
+  const activePivots = useMemo(() => {
+    const aiSup = candlestickAi?.support
+    const aiRes = candlestickAi?.resistance
+
+    if (typeof aiSup === 'number' && !isNaN(aiSup) && typeof aiRes === 'number' && !isNaN(aiRes)) {
+      return { support: aiSup, resistance: aiRes }
+    }
+
+    if (displayCandles.length >= 3) {
+      const lows = displayCandles.map((c) => c.low).filter((v) => typeof v === 'number' && !isNaN(v))
+      const highs = displayCandles.map((c) => c.high).filter((v) => typeof v === 'number' && !isNaN(v))
+      return {
+        support: lows.length ? parseFloat(Math.min(...lows).toFixed(2)) : undefined,
+        resistance: highs.length ? parseFloat(Math.max(...highs).toFixed(2)) : undefined,
+      }
+    }
+    return { support: undefined, resistance: undefined }
+  }, [candlestickAi, displayCandles])
+
   // Chart dimensions & scaling (responsive SVG viewBox)
   const width = 800
   const height = 310
-  const padding = { top: 22, right: 82, bottom: 28, left: 10 }
+  const padding = { top: 22, right: 86, bottom: 28, left: 10 }
   const chartWidth = width - padding.left - padding.right
   const chartHeight = height - padding.top - padding.bottom
 
@@ -95,14 +114,14 @@ export function CandlestickChart({
     })
 
     // Include auto markup pivots if enabled
-    if (autoMarkup && candlestickAi) {
-      if (typeof candlestickAi.support === 'number' && !isNaN(candlestickAi.support)) {
-        if (candlestickAi.support < min) min = candlestickAi.support
-        if (candlestickAi.support > max) max = candlestickAi.support
+    if (autoMarkup) {
+      if (typeof activePivots.support === 'number' && !isNaN(activePivots.support)) {
+        if (activePivots.support < min) min = activePivots.support
+        if (activePivots.support > max) max = activePivots.support
       }
-      if (typeof candlestickAi.resistance === 'number' && !isNaN(candlestickAi.resistance)) {
-        if (candlestickAi.resistance < min) min = candlestickAi.resistance
-        if (candlestickAi.resistance > max) max = candlestickAi.resistance
+      if (typeof activePivots.resistance === 'number' && !isNaN(activePivots.resistance)) {
+        if (activePivots.resistance < min) min = activePivots.resistance
+        if (activePivots.resistance > max) max = activePivots.resistance
       }
     }
 
@@ -111,7 +130,7 @@ export function CandlestickChart({
       minPrice: min - buffer,
       priceRange: max - min + buffer * 2,
     }
-  }, [displayCandles, markupLines, autoMarkup, candlestickAi])
+  }, [displayCandles, markupLines, autoMarkup, activePivots])
 
   const getY = (price: number) => {
     return padding.top + chartHeight - ((price - minPrice) / priceRange) * chartHeight
@@ -275,70 +294,70 @@ export function CandlestickChart({
             )
           })}
 
-          {/* AUTOMATIC MARKUP: Support Level (from Technical Analysis) */}
-          {autoMarkup && candlestickAi?.support && typeof candlestickAi.support === 'number' && (
+          {/* AUTOMATIC MARKUP: Support Level */}
+          {autoMarkup && typeof activePivots.support === 'number' && (
             <g className="auto-markup-support">
               <line
                 x1={padding.left}
-                y1={getY(candlestickAi.support)}
+                y1={getY(activePivots.support)}
                 x2={width - padding.right}
-                y2={getY(candlestickAi.support)}
+                y2={getY(activePivots.support)}
                 stroke="#10b981"
                 strokeWidth={1.8}
                 strokeDasharray="6 3"
               />
               <rect
                 x={width - padding.right + 2}
-                y={getY(candlestickAi.support) - 8}
-                width={76}
+                y={getY(activePivots.support) - 8}
+                width={80}
                 height={16}
                 rx={3}
                 fill="#10b981"
                 className="opacity-95"
               />
               <text
-                x={width - padding.right + 6}
-                y={getY(candlestickAi.support) + 3.5}
-                fontSize={9}
+                x={width - padding.right + 5}
+                y={getY(activePivots.support) + 3.5}
+                fontSize={8.5}
                 fill="#ffffff"
                 fontWeight="bold"
                 className="font-mono"
               >
-                S: {candlestickAi.support.toFixed(1)}
+                S: {activePivots.support.toFixed(1)}
               </text>
             </g>
           )}
 
-          {/* AUTOMATIC MARKUP: Resistance Level (from Technical Analysis) */}
-          {autoMarkup && candlestickAi?.resistance && typeof candlestickAi.resistance === 'number' && (
+          {/* AUTOMATIC MARKUP: Resistance Level */}
+          {autoMarkup && typeof activePivots.resistance === 'number' && (
             <g className="auto-markup-resistance">
               <line
                 x1={padding.left}
-                y1={getY(candlestickAi.resistance)}
+                y1={getY(activePivots.resistance)}
                 x2={width - padding.right}
-                y2={getY(candlestickAi.resistance)}
+                y2={getY(activePivots.resistance)}
                 stroke="#f43f5e"
                 strokeWidth={1.8}
                 strokeDasharray="6 3"
               />
               <rect
                 x={width - padding.right + 2}
-                y={getY(candlestickAi.resistance) - 8}
-                width={76}
+                y={getY(activePivots.resistance) - 8}
+                width={80}
                 height={16}
                 rx={3}
                 fill="#f43f5e"
                 className="opacity-95"
               />
               <text
-                x={width - padding.right + 6}
-                y={getY(candlestickAi.resistance) + 3.5}
-                fontSize={9}
+                x={width - padding.right + 5}
+                y={getY(activePivots.resistance) + 3.5}
+                fontSize={8.5}
                 fill="#ffffff"
                 fontWeight="bold"
                 className="font-mono"
               >
-                R: {candlestickAi.resistance.toFixed(1)}
+                R: {activePivots.resistance.toFixed(1)}
               </text>
             </g>
           )}
@@ -364,7 +383,7 @@ export function CandlestickChart({
                   <rect
                     x={width - padding.right + 2}
                     y={y - 8}
-                    width={76}
+                    width={80}
                     height={16}
                     rx={3}
                     fill={strokeColor}
@@ -373,7 +392,7 @@ export function CandlestickChart({
                   <text
                     x={width - padding.right + 5}
                     y={y + 3.5}
-                    fontSize={9}
+                    fontSize={8.5}
                     fill="#ffffff"
                     fontWeight="bold"
                     className="font-mono"
@@ -501,20 +520,20 @@ export function CandlestickChart({
             </p>
 
             {/* Support / Resistance Levels with Correct Currency Symbol */}
-            {(candlestickAi?.support || candlestickAi?.resistance) && (
+            {(typeof activePivots.support === 'number' || typeof activePivots.resistance === 'number') && (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 font-mono text-[11px]">
-                {candlestickAi.support && (
+                {typeof activePivots.support === 'number' && (
                   <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
                     <Shield className="w-3 h-3 text-emerald-500" />
                     <span>Key Pivot Support:</span>
-                    <strong>{formatCurrency(candlestickAi.support, chartCurrency)}</strong>
+                    <strong>{formatCurrency(activePivots.support, chartCurrency)}</strong>
                   </div>
                 )}
-                {candlestickAi.resistance && (
+                {typeof activePivots.resistance === 'number' && (
                   <div className="flex items-center gap-1 text-rose-700 dark:text-rose-400">
                     <TrendingDown className="w-3 h-3 text-rose-500" />
                     <span>Overhead Resistance:</span>
-                    <strong>{formatCurrency(candlestickAi.resistance, chartCurrency)}</strong>
+                    <strong>{formatCurrency(activePivots.resistance, chartCurrency)}</strong>
                   </div>
                 )}
               </div>

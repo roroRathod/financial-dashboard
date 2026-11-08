@@ -117,9 +117,15 @@ export function DetailModal({
           fetchCandlestickAi({ ticker: asset.ticker, name: asset.name, candles: rows, use_llm: aiEnabled })
             .then((cRes) => setCandlestickAi(cRes))
             .catch(() => {
+              const highs = rows.map((r: any) => r.high || r.close).filter((v: any) => typeof v === 'number' && !isNaN(v))
+              const lows = rows.map((r: any) => r.low || r.close).filter((v: any) => typeof v === 'number' && !isNaN(v))
+              const s = lows.length ? Math.min(...lows) : undefined
+              const r = highs.length ? Math.max(...highs) : undefined
               setCandlestickAi({
                 patterns: ['Multi-bar session range consolidation'],
                 sentiment: 'Constructive Consolidation',
+                support: s ? parseFloat(s.toFixed(2)) : undefined,
+                resistance: r ? parseFloat(r.toFixed(2)) : undefined,
                 analysis: 'Price action is compressing within intermediate Bollinger bands near pivot support.',
                 source: 'Heuristic Candlestick Pattern Engine',
               })
