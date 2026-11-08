@@ -17,7 +17,7 @@ COMMODITIES_CONFIG = {
             "usd_unit": "$ / oz",
             "usd_sub": "$ per troy ounce (COMEX Spot)",
             "karats": ibja["karats"],
-            "benchmark": ibja["source"],
+            "benchmark": "IBJA Benchmark (Mumbai Zaveri Bazar) & MCX",
         },
     },
     "Silver": {
@@ -26,11 +26,35 @@ COMMODITIES_CONFIG = {
         "calc": lambda usd, rate, ibja: {
             "inr_price": round(ibja["silver_999"] / 1000, 2),
             "inr_unit": "₹ / g",
-            "inr_sub": f"₹{ibja['silver_999']:,} per 1kg (IBJA Silver 999)",
+            "inr_sub": f"₹{ibja['silver_999']:,} per 1kg (IBJA / MCX Silver 999)",
             "usd_price": round(usd, 2),
             "usd_unit": "$ / oz",
             "usd_sub": "$ per troy ounce (COMEX Spot)",
-            "benchmark": ibja["source"],
+            "benchmark": "IBJA Benchmark (Mumbai) & MCX",
+        },
+    },
+    "Crude Oil": {
+        "ticker": "CL=F",
+        "calc": lambda usd, rate, ibja: {
+            "inr_price": round(usd * rate, 2),
+            "inr_unit": "₹ / barrel",
+            "inr_sub": f"₹{round((usd * rate) / 158.987, 2)} / litre (MCX Domestic Benchmark)",
+            "usd_price": round(usd, 2),
+            "usd_unit": "$ / bbl",
+            "usd_sub": "$ per 42-gal barrel (NYMEX WTI)",
+            "benchmark": "MCX Crude Oil Contract",
+        },
+    },
+    "Natural Gas": {
+        "ticker": "NG=F",
+        "calc": lambda usd, rate, ibja: {
+            "inr_price": round(usd * rate, 2),
+            "inr_unit": "₹ / MMBtu",
+            "inr_sub": f"₹{round((usd * rate) / 28.3, 2)} / SCM (MCX Domestic Piped)",
+            "usd_price": round(usd, 2),
+            "usd_unit": "$ / MMBtu",
+            "usd_sub": "$ per million BTU (Henry Hub)",
+            "benchmark": "MCX Natural Gas Contract",
         },
     },
     "Copper": {
@@ -38,10 +62,11 @@ COMMODITIES_CONFIG = {
         "calc": lambda usd, rate, ibja: {
             "inr_price": round((usd / 0.45359237) * rate, 2),
             "inr_unit": "₹ / kg",
-            "inr_sub": "Domestic industrial rate (COMEX converted)",
+            "inr_sub": "MCX Benchmark Lot (2,500 kg)",
             "usd_price": round(usd, 2),
             "usd_unit": "$ / lb",
-            "usd_sub": "$ per pound",
+            "usd_sub": "$ per pound (COMEX)",
+            "benchmark": "MCX Copper Contract",
         },
     },
     "Aluminium": {
@@ -49,10 +74,11 @@ COMMODITIES_CONFIG = {
         "calc": lambda usd, rate, ibja: {
             "inr_price": round((usd / 1000) * rate, 2),
             "inr_unit": "₹ / kg",
-            "inr_sub": f"₹{round((usd) * rate):,} per tonne",
+            "inr_sub": f"₹{round(usd * rate):,} per metric tonne (MCX Lot)",
             "usd_price": round(usd, 2),
             "usd_unit": "$ / tonne",
-            "usd_sub": "$ per metric tonne",
+            "usd_sub": "$ per metric tonne (LME)",
+            "benchmark": "MCX Aluminium Contract",
         },
     },
     "Zinc": {
@@ -60,43 +86,11 @@ COMMODITIES_CONFIG = {
         "calc": lambda usd, rate, ibja: {
             "inr_price": round((usd / 1000) * rate, 2),
             "inr_unit": "₹ / kg",
-            "inr_sub": f"₹{round((usd) * rate):,} per tonne",
+            "inr_sub": f"₹{round(usd * rate):,} per metric tonne (MCX Lot)",
             "usd_price": round(usd, 2),
             "usd_unit": "$ / tonne",
-            "usd_sub": "$ per metric tonne",
-        },
-    },
-    "Crude Oil WTI": {
-        "ticker": "CL=F",
-        "calc": lambda usd, rate, ibja: {
-            "inr_price": round((usd / 42) * rate, 2),
-            "inr_unit": "₹ / gallon",
-            "inr_sub": f"₹{round((usd / 158.987) * rate, 2)} / litre",
-            "usd_price": round(usd, 2),
-            "usd_unit": "$ / bbl",
-            "usd_sub": "$ per 42-gal barrel",
-        },
-    },
-    "Crude Oil Brent": {
-        "ticker": "BZ=F",
-        "calc": lambda usd, rate, ibja: {
-            "inr_price": round((usd / 42) * rate, 2),
-            "inr_unit": "₹ / gallon",
-            "inr_sub": f"₹{round((usd / 158.987) * rate, 2)} / litre",
-            "usd_price": round(usd, 2),
-            "usd_unit": "$ / bbl",
-            "usd_sub": "$ per 42-gal barrel",
-        },
-    },
-    "Natural Gas": {
-        "ticker": "NG=F",
-        "calc": lambda usd, rate, ibja: {
-            "inr_price": round((usd / 12.11) * rate, 2),
-            "inr_unit": "₹ / gallon",
-            "inr_sub": f"₹{round(usd * rate, 2)} / MMBtu",
-            "usd_price": round(usd, 2),
-            "usd_unit": "$ / MMBtu",
-            "usd_sub": "$ per million BTU",
+            "usd_sub": "$ per metric tonne (LME)",
+            "benchmark": "MCX Zinc Contract",
         },
     },
 }
@@ -143,7 +137,6 @@ async def list_commodities():
             "history": history(ticker),
         }
 
-        # Add karats and benchmark metadata if available (e.g. for Gold)
         if "karats" in rates:
             item["karats"] = rates["karats"]
             item["inr"]["karats"] = rates["karats"]

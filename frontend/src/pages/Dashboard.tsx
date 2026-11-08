@@ -573,13 +573,13 @@ export function Dashboard() {
                 <Coins className="w-5 h-5 text-emerald-600 dark:text-[#b7eb4d]" />
                 <span>Commodities Desk</span>
                 <span className="text-xs font-normal text-stone-500 dark:text-slate-400">
-                  {commodityCurrency === 'INR' ? '— Indian Domestic Buying Rates' : '— International Benchmark Rates'}
+                  {commodityCurrency === 'INR' ? '— Indian Domestic Market Contracts (MCX & IBJA)' : '— International Benchmark Futures (COMEX & NYMEX)'}
                 </span>
               </h2>
               <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">
                 {commodityCurrency === 'INR'
-                  ? 'Domestic spot rates sourced live from India Bullion and Jewellers Association (IBJA, Mumbai Zaveri Bazar). Toggle 24K, 22K, or 18K for real-time purity rates.'
-                  : 'Benchmark international commodity futures in standard COMEX/NYMEX trading units ($/oz, $/lb, $/barrel, $/tonne).'}
+                  ? 'Official Indian domestic contract specifications: Bullion via IBJA Mumbai benchmarks (24K, 22K, 18K), Crude in ₹/bbl & ₹/L, Natural Gas in ₹/MMBtu & ₹/SCM, and Base Metals in ₹/kg.'
+                  : 'Benchmark international commodity futures in standard US trading units ($/oz, $/lb, $/barrel, $/tonne).'}
               </p>
             </div>
 
@@ -595,7 +595,7 @@ export function Dashboard() {
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
                 )}
               >
-                Domestic Rates (₹)
+                Indian Market (₹)
               </button>
               <button
                 type="button"
@@ -607,7 +607,7 @@ export function Dashboard() {
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
                 )}
               >
-                International ($)
+                Global Markets ($)
               </button>
             </div>
           </div>
