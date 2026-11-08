@@ -171,10 +171,10 @@ export function DetailModal({
   const isUp = currentChange >= 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl bg-white dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden max-h-[94vh] flex flex-col text-stone-900 dark:text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-1.5 xs:p-2 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm overflow-hidden">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] flex flex-col text-stone-900 dark:text-slate-100">
         {/* Header */}
-        <div className="p-3.5 sm:p-6 border-b border-stone-200 dark:border-slate-800 flex justify-between items-start bg-stone-50/80 dark:bg-[#0e1424]">
+        <div className="p-3 sm:p-5 border-b border-stone-200 dark:border-slate-800 flex justify-between items-start bg-stone-50/80 dark:bg-[#0e1424] shrink-0">
           <div className="min-w-0 flex-1 pr-2">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <CompanyLogo
@@ -249,7 +249,7 @@ export function DetailModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-3.5 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5">
+        <div className="p-3 sm:p-5 overflow-y-auto overflow-x-hidden space-y-3.5 sm:space-y-4 max-w-full min-w-0 flex-1 overscroll-contain">
           {/* Chart Controls: Candlestick vs Area + Timeframe */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
             {/* View Switcher: Candlestick vs Line Area */}
@@ -311,6 +311,7 @@ export function DetailModal({
             <CandlestickChart
               candles={historyData}
               currency={asset.currency || 'INR'}
+              ticker={asset.ticker}
               candlestickAi={candlestickAi}
               aiLoading={candleAiLoading}
             />

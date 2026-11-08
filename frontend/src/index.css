@@ -21,11 +21,18 @@
     --logo-color: #b7eb4d;
   }
 
+  html, body, #root {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   body {
     background-color: var(--bg-main);
     color: var(--text-primary);
     @apply antialiased transition-colors duration-150;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Completely remove ugly default browser scrollbars while keeping smooth scrolling */

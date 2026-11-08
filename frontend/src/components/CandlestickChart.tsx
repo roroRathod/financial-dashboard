@@ -3,6 +3,9 @@ import {
   Plus,
   Trash2,
   BarChart2,
+  SlidersHorizontal,
+  Shield,
+  TrendingDown,
 } from 'lucide-react'
 import { formatCurrency, cn } from '../lib/utils'
 
@@ -19,11 +22,13 @@ type MarkupLine = {
   id: string
   price: number
   type: 'support' | 'resistance'
+  label?: string
 }
 
 type CandlestickChartProps = {
   candles: Candle[]
   currency?: string
+  ticker?: string
   candlestickAi?: {
     patterns: string[]
     sentiment: string
@@ -38,23 +43,39 @@ type CandlestickChartProps = {
 export function CandlestickChart({
   candles,
   currency = 'INR',
+  ticker = '',
   candlestickAi,
   aiLoading = false,
 }: CandlestickChartProps) {
   const [markupLines, setMarkupLines] = useState<MarkupLine[]>([])
   const [activeTool, setActiveTool] = useState<'support' | 'resistance' | null>(null)
+  const [autoMarkup, setAutoMarkup] = useState<boolean>(true)
   const [hoveredCandle, setHoveredCandle] = useState<{ candle: Candle; x: number; y: number } | null>(null)
   const svgRef = useRef<SVGSVGElement | null>(null)
 
-  // Use the last 30 candles for clean readability on all screens
+  // Determine native currency of candles to prevent showing ₹ on $4,000 USD commodities
+  const chartCurrency = useMemo(() => {
+    const usdTickers = ['GC=F', 'SI=F', 'CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ALI=F', 'ZINC=F']
+    if (usdTickers.includes(ticker) || ticker.startsWith('^') || (!ticker.endsWith('.NS') && !ticker.endsWith('.BO') && currency === 'USD')) {
+      return 'USD'
+    }
+    if (candles.length > 0) {
+      const avg = candles[0].close
+      // Gold COMEX trades ~3500-5000 USD, while domestic 24K is ~14,000 INR/g or 140,000 INR/10g
+      if (ticker.includes('GC=F') && avg < 10000) return 'USD'
+    }
+    return currency || 'INR'
+  }, [ticker, currency, candles])
+
+  // Use the last 32 candles for clean readability on all screens
   const displayCandles = useMemo(() => {
     return candles.slice(-32)
   }, [candles])
 
-  // Chart dimensions & scaling
+  // Chart dimensions & scaling (responsive SVG viewBox)
   const width = 800
-  const height = 300
-  const padding = { top: 20, right: 65, bottom: 30, left: 10 }
+  const height = 310
+  const padding = { top: 22, right: 82, bottom: 28, left: 10 }
   const chartWidth = width - padding.left - padding.right
   const chartHeight = height - padding.top - padding.bottom
 
@@ -66,17 +87,31 @@ export function CandlestickChart({
       if (c.low < min) min = c.low
       if (c.high > max) max = c.high
     })
-    // Also include markup lines in range if any
+
+    // Include custom markup lines
     markupLines.forEach((m) => {
       if (m.price < min) min = m.price
       if (m.price > max) max = m.price
     })
+
+    // Include auto markup pivots if enabled
+    if (autoMarkup && candlestickAi) {
+      if (typeof candlestickAi.support === 'number' && !isNaN(candlestickAi.support)) {
+        if (candlestickAi.support < min) min = candlestickAi.support
+        if (candlestickAi.support > max) max = candlestickAi.support
+      }
+      if (typeof candlestickAi.resistance === 'number' && !isNaN(candlestickAi.resistance)) {
+        if (candlestickAi.resistance < min) min = candlestickAi.resistance
+        if (candlestickAi.resistance > max) max = candlestickAi.resistance
+      }
+    }
+
     const buffer = (max - min) * 0.08 || 1
     return {
       minPrice: min - buffer,
       priceRange: max - min + buffer * 2,
     }
-  }, [displayCandles, markupLines])
+  }, [displayCandles, markupLines, autoMarkup, candlestickAi])
 
   const getY = (price: number) => {
     return padding.top + chartHeight - ((price - minPrice) / priceRange) * chartHeight
@@ -88,10 +123,10 @@ export function CandlestickChart({
     return minPrice + ratio * priceRange
   }
 
-  const candleWidth = Math.max(4, Math.min(18, chartWidth / (displayCandles.length || 1) * 0.72))
+  const candleWidth = Math.max(4, Math.min(18, (chartWidth / (displayCandles.length || 1)) * 0.72))
   const candleGap = chartWidth / (displayCandles.length || 1)
 
-  // Handle clicking to place a markup line
+  // Handle clicking to place a manual markup line
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!activeTool || !svgRef.current) return
     const rect = svgRef.current.getBoundingClientRect()
@@ -104,6 +139,7 @@ export function CandlestickChart({
         id: Math.random().toString(36).substring(2, 9),
         price: parseFloat(clickedPrice.toFixed(2)),
         type: activeTool,
+        label: activeTool === 'support' ? 'Custom Support' : 'Custom Resist',
       },
     ])
     setActiveTool(null)
@@ -130,44 +166,61 @@ export function CandlestickChart({
   }
 
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-3 max-w-full overflow-hidden">
       {/* Markup Toolbar & Tooling State */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[11px] font-medium text-stone-500 dark:text-slate-400">Chart Markup:</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs max-w-full">
+        <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+          {/* Master Auto Markup Toggle */}
+          <button
+            type="button"
+            onClick={() => setAutoMarkup(!autoMarkup)}
+            className={cn(
+              'px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors flex items-center gap-1.5 shrink-0',
+              autoMarkup
+                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/40 shadow-xs'
+                : 'bg-stone-100 dark:bg-slate-800 text-stone-500 dark:text-slate-400 border-stone-200 dark:border-slate-700 hover:text-stone-800 dark:hover:text-white',
+            )}
+            title="Automatically plot calculated pivot support and resistance levels directly on the chart"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Auto Markup: {autoMarkup ? 'ON' : 'OFF'}</span>
+          </button>
+
+          {/* Manual Support Tool */}
           <button
             type="button"
             onClick={() => setActiveTool(activeTool === 'support' ? null : 'support')}
             className={cn(
-              'px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1',
+              'px-2 py-1 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 shrink-0',
               activeTool === 'support'
                 ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500'
                 : 'bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 border-stone-200 dark:border-slate-700 hover:border-emerald-500',
             )}
           >
             <Plus className="w-3 h-3 text-emerald-500" />
-            <span>Support Line</span>
+            <span>+ Support</span>
           </button>
 
+          {/* Manual Resistance Tool */}
           <button
             type="button"
             onClick={() => setActiveTool(activeTool === 'resistance' ? null : 'resistance')}
             className={cn(
-              'px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1',
+              'px-2 py-1 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 shrink-0',
               activeTool === 'resistance'
                 ? 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500'
                 : 'bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 border-stone-200 dark:border-slate-700 hover:border-rose-500',
             )}
           >
             <Plus className="w-3 h-3 text-rose-500" />
-            <span>Resistance Line</span>
+            <span>+ Resistance</span>
           </button>
 
           {markupLines.length > 0 && (
             <button
               type="button"
               onClick={() => setMarkupLines([])}
-              className="px-2 py-1 text-stone-400 hover:text-rose-500 text-xs flex items-center gap-1 transition-colors"
+              className="px-2 py-1 text-stone-400 hover:text-rose-500 text-xs flex items-center gap-1 transition-colors shrink-0"
             >
               <Trash2 className="w-3 h-3" />
               <span>Clear ({markupLines.length})</span>
@@ -176,19 +229,20 @@ export function CandlestickChart({
         </div>
 
         {activeTool && (
-          <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium animate-pulse">
-            Click anywhere on chart to place {activeTool} level
+          <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium animate-pulse shrink-0">
+            Click chart to plot {activeTool} level
           </span>
         )}
       </div>
 
       {/* Candlestick SVG Container */}
-      <div className="relative w-full bg-stone-50 dark:bg-[#070b14] rounded-xl border border-stone-200 dark:border-slate-800/80 p-2 overflow-hidden select-none">
+      <div className="relative w-full max-w-full bg-stone-50 dark:bg-[#070b14] rounded-xl border border-stone-200 dark:border-slate-800/80 p-1 sm:p-2 overflow-hidden select-none">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
           className={cn(
-            'w-full h-64 sm:h-72',
+            'w-full h-60 xs:h-64 sm:h-72',
             activeTool ? 'cursor-crosshair' : 'cursor-default',
           )}
           onClick={handleSvgClick}
@@ -210,18 +264,86 @@ export function CandlestickChart({
                   strokeWidth={1}
                 />
                 <text
-                  x={width - padding.right + 6}
+                  x={width - padding.right + 5}
                   y={y + 3.5}
                   fontSize={10}
                   className="fill-stone-400 dark:fill-slate-500 font-mono"
                 >
-                  {formatCurrency(p, currency).replace('₹', '')}
+                  {p.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                 </text>
               </g>
             )
           })}
 
-          {/* Placed Markup Support / Resistance Lines */}
+          {/* AUTOMATIC MARKUP: Support Level (from Technical Analysis) */}
+          {autoMarkup && candlestickAi?.support && typeof candlestickAi.support === 'number' && (
+            <g className="auto-markup-support">
+              <line
+                x1={padding.left}
+                y1={getY(candlestickAi.support)}
+                x2={width - padding.right}
+                y2={getY(candlestickAi.support)}
+                stroke="#10b981"
+                strokeWidth={1.8}
+                strokeDasharray="6 3"
+              />
+              <rect
+                x={width - padding.right + 2}
+                y={getY(candlestickAi.support) - 8}
+                width={76}
+                height={16}
+                rx={3}
+                fill="#10b981"
+                className="opacity-95"
+              />
+              <text
+                x={width - padding.right + 6}
+                y={getY(candlestickAi.support) + 3.5}
+                fontSize={9}
+                fill="#ffffff"
+                fontWeight="bold"
+                className="font-mono"
+              >
+                S: {candlestickAi.support.toFixed(1)}
+              </text>
+            </g>
+          )}
+
+          {/* AUTOMATIC MARKUP: Resistance Level (from Technical Analysis) */}
+          {autoMarkup && candlestickAi?.resistance && typeof candlestickAi.resistance === 'number' && (
+            <g className="auto-markup-resistance">
+              <line
+                x1={padding.left}
+                y1={getY(candlestickAi.resistance)}
+                x2={width - padding.right}
+                y2={getY(candlestickAi.resistance)}
+                stroke="#f43f5e"
+                strokeWidth={1.8}
+                strokeDasharray="6 3"
+              />
+              <rect
+                x={width - padding.right + 2}
+                y={getY(candlestickAi.resistance) - 8}
+                width={76}
+                height={16}
+                rx={3}
+                fill="#f43f5e"
+                className="opacity-95"
+              />
+              <text
+                x={width - padding.right + 6}
+                y={getY(candlestickAi.resistance) + 3.5}
+                fontSize={9}
+                fill="#ffffff"
+                fontWeight="bold"
+                className="font-mono"
+              >
+                R: {candlestickAi.resistance.toFixed(1)}
+              </text>
+            </g>
+          )}
+
+          {/* USER CUSTOM MARKUP LINES */}
           {markupLines.map((line) => {
             const y = getY(line.price)
             const isSupport = line.type === 'support'
@@ -238,15 +360,11 @@ export function CandlestickChart({
                   strokeWidth={1.5}
                   strokeDasharray="4 2"
                 />
-                {/* Price Tag Badge - click to remove line */}
-                <g
-                  onClick={(e) => removeMarkupLine(line.id, e)}
-                  className="cursor-pointer"
-                >
+                <g onClick={(e) => removeMarkupLine(line.id, e)} className="cursor-pointer">
                   <rect
                     x={width - padding.right + 2}
                     y={y - 8}
-                    width={60}
+                    width={76}
                     height={16}
                     rx={3}
                     fill={strokeColor}
@@ -255,7 +373,7 @@ export function CandlestickChart({
                   <text
                     x={width - padding.right + 5}
                     y={y + 3.5}
-                    fontSize={9.5}
+                    fontSize={9}
                     fill="#ffffff"
                     fontWeight="bold"
                     className="font-mono"
@@ -286,7 +404,6 @@ export function CandlestickChart({
                 onMouseEnter={() => setHoveredCandle({ candle, x: xCenter, y: closeY })}
                 className="hover:opacity-80 transition-opacity"
               >
-                {/* Wick Line: low to high */}
                 <line
                   x1={xCenter}
                   y1={highY}
@@ -295,7 +412,6 @@ export function CandlestickChart({
                   stroke={candleColor}
                   strokeWidth={1.2}
                 />
-                {/* Candle Real Body */}
                 <rect
                   x={xCenter - candleWidth / 2}
                   y={bodyY}
@@ -311,17 +427,11 @@ export function CandlestickChart({
 
         {/* Hover Crosshair Info Pill */}
         {hoveredCandle && (
-          <div className="absolute top-3 left-3 bg-stone-900/90 dark:bg-slate-900/95 text-white border border-stone-700 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono shadow-md pointer-events-none flex items-center gap-3">
+          <div className="absolute top-2 left-2 bg-stone-900/90 dark:bg-slate-900/95 text-white border border-stone-700 dark:border-slate-700 rounded-lg px-2.5 py-1 text-[11px] font-mono shadow-md pointer-events-none flex flex-wrap items-center gap-2 max-w-[90%]">
             <span className="text-stone-300 font-sans">{hoveredCandle.candle.date}</span>
-            <span>
-              O: <strong className="text-stone-200">{hoveredCandle.candle.open}</strong>
-            </span>
-            <span>
-              H: <strong className="text-emerald-400">{hoveredCandle.candle.high}</strong>
-            </span>
-            <span>
-              L: <strong className="text-rose-400">{hoveredCandle.candle.low}</strong>
-            </span>
+            <span>O: <strong className="text-stone-200">{hoveredCandle.candle.open}</strong></span>
+            <span>H: <strong className="text-emerald-400">{hoveredCandle.candle.high}</strong></span>
+            <span>L: <strong className="text-rose-400">{hoveredCandle.candle.low}</strong></span>
             <span>
               C:{' '}
               <strong
@@ -339,19 +449,19 @@ export function CandlestickChart({
       </div>
 
       {/* AI Candlestick Technical Analysis Card */}
-      <div className="p-3.5 sm:p-4 rounded-xl bg-stone-100/70 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 space-y-2.5">
-        <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-slate-800">
+      <div className="p-3 sm:p-4 rounded-xl bg-stone-100/70 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 space-y-2 max-w-full overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-1.5 pb-2 border-b border-stone-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <BarChart2 className="w-4 h-4 text-emerald-600 dark:text-[#b7eb4d]" />
             <h4 className="text-xs sm:text-sm font-semibold text-stone-900 dark:text-white">
-              Candlestick Pattern Recognition & Structure
+              Technical Structure & Auto Pivots
             </h4>
           </div>
 
           {candlestickAi?.sentiment && (
             <span
               className={cn(
-                'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border',
+                'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border shrink-0',
                 candlestickAi.sentiment.includes('Bullish')
                   ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
                   : candlestickAi.sentiment.includes('Bearish')
@@ -371,7 +481,6 @@ export function CandlestickChart({
           </div>
         ) : (
           <div className="space-y-2 text-xs">
-            {/* Patterns Detected */}
             {candlestickAi?.patterns && candlestickAi.patterns.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[11px] text-stone-500 dark:text-slate-400">Pattern:</span>
@@ -386,23 +495,26 @@ export function CandlestickChart({
               </div>
             )}
 
-            {/* Analysis text */}
             <p className="text-stone-700 dark:text-slate-300 leading-relaxed font-sans text-xs sm:text-[13px]">
               {candlestickAi?.analysis ||
                 'Watching price interaction between recent candle extremes and volume distribution.'}
             </p>
 
-            {/* Support / Resistance Levels */}
+            {/* Support / Resistance Levels with Correct Currency Symbol */}
             {(candlestickAi?.support || candlestickAi?.resistance) && (
-              <div className="flex items-center gap-4 pt-1 font-mono text-[11px]">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 font-mono text-[11px]">
                 {candlestickAi.support && (
-                  <div className="text-emerald-700 dark:text-emerald-400">
-                    Key Pivot Support: <strong>{formatCurrency(candlestickAi.support, currency)}</strong>
+                  <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
+                    <Shield className="w-3 h-3 text-emerald-500" />
+                    <span>Key Pivot Support:</span>
+                    <strong>{formatCurrency(candlestickAi.support, chartCurrency)}</strong>
                   </div>
                 )}
                 {candlestickAi.resistance && (
-                  <div className="text-rose-700 dark:text-rose-400">
-                    Overhead Resistance: <strong>{formatCurrency(candlestickAi.resistance, currency)}</strong>
+                  <div className="flex items-center gap-1 text-rose-700 dark:text-rose-400">
+                    <TrendingDown className="w-3 h-3 text-rose-500" />
+                    <span>Overhead Resistance:</span>
+                    <strong>{formatCurrency(candlestickAi.resistance, chartCurrency)}</strong>
                   </div>
                 )}
               </div>
