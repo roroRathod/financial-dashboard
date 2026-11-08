@@ -37,7 +37,7 @@ export function MarketDetail({ region: propRegion }: { region?: Region }) {
   if (!data || data.error) return <div className="p-4 text-red-400">Failed to load {label}</div>
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-3.5 sm:p-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => navigate('/')}
@@ -45,10 +45,10 @@ export function MarketDetail({ region: propRegion }: { region?: Region }) {
         >
           ← Back to dashboard
         </button>
-        <h1 className="text-xl font-bold">{label} Markets</h1>
+        <h1 className="text-lg sm:text-xl font-bold">{label} Markets</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         {Object.entries(data.data || {}).map(([name, q]: [string, any]) => (
           <MarketCard
             key={name}
@@ -61,7 +61,7 @@ export function MarketDetail({ region: propRegion }: { region?: Region }) {
 
       {/* Heatmap for India equities */}
       {region === 'INDIA' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 sm:p-4">
           <h3 className="font-medium mb-2 text-sm">Nifty 50 Heatmap</h3>
           <Heatmap stocks={[]} />
         </div>

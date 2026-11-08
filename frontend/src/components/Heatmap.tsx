@@ -318,20 +318,21 @@ export function Heatmap({
       <div className="space-y-3 mb-4 pb-4 border-b border-stone-200 dark:border-slate-800/80">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Market Region Filter: India | US | Global */}
-          <div className="flex items-center gap-1.5 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 p-0.5 sm:p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl overflow-x-auto no-scrollbar max-w-full shrink-0">
             {(['INDIA', 'US', 'GLOBAL'] as MarketRegion[]).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => handleMarketChange(m)}
                 className={cn(
-                  'px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
+                  'px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
                   activeMarket === m
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-sm border border-stone-200 dark:border-slate-700'
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
                 )}
               >
-                {m === 'INDIA' ? 'India (NSE / BSE)' : m === 'US' ? 'United States (NYSE)' : 'Global Markets'}
+                <span className="hidden sm:inline">{m === 'INDIA' ? 'India (NSE / BSE)' : m === 'US' ? 'United States (NYSE)' : 'Global Markets'}</span>
+                <span className="sm:hidden">{m === 'INDIA' ? 'India' : m === 'US' ? 'US (NYSE)' : 'Global'}</span>
               </button>
             ))}
           </div>
@@ -368,14 +369,14 @@ export function Heatmap({
 
         {/* 2. Index Selector Chips for Current Market */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-1">
             {MARKET_INDICES[activeMarket].map((idx) => (
               <button
                 key={idx.id}
                 type="button"
                 onClick={() => onChangeIndex && onChangeIndex(idx.id)}
                 className={cn(
-                  'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap border',
+                  'px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap border shrink-0',
                   indexName === idx.id
                     ? 'bg-stone-900 text-white dark:bg-slate-800 dark:text-white border-stone-900 dark:border-slate-700'
                     : 'bg-stone-50 dark:bg-slate-900/60 text-stone-600 dark:text-slate-400 border-stone-200 dark:border-slate-800 hover:text-stone-900 dark:hover:text-white',

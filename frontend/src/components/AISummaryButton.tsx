@@ -46,7 +46,7 @@ export function AISummaryButton({ asset_class, region, data }: AISummaryButtonPr
           <div className="font-semibold text-blue-400 mb-1 mt-2">What happened</div>
           <div className="text-slate-300">{result.what}</div>
           <div className="font-semibold text-blue-400 mb-1 mt-2">SWOT</div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div className="bg-green-900/20 border border-green-900/30 rounded p-2">
               <div className="text-green-400 text-xs font-bold mb-1">Strengths</div>
               <ul className="list-disc list-inside text-slate-300">

@@ -200,7 +200,7 @@ export function ScreenerTable({
   }
 
   return (
-    <div className="bg-white dark:bg-[#0e1422] border border-stone-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4 select-none text-stone-900 dark:text-slate-100">
+    <div className="bg-white dark:bg-[#0e1422] border border-stone-200 dark:border-slate-800 rounded-2xl p-3 sm:p-6 shadow-xs space-y-4 select-none text-stone-900 dark:text-slate-100 max-w-full">
       {/* 1. Screener Top Header & Index Universe Pills */}
       <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 pb-4 border-b border-stone-200 dark:border-slate-800">
         <div>
@@ -219,14 +219,14 @@ export function ScreenerTable({
         </div>
 
         {/* Timeframe Controls */}
-        <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-1 rounded-xl self-start lg:self-auto">
+        <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-0.5 sm:p-1 rounded-xl self-start lg:self-auto overflow-x-auto no-scrollbar max-w-full shrink-0">
           {['1D', '1W', '1M', '3M', '6M', 'YTD', '1Y'].map((tf) => (
             <button
               key={tf}
               type="button"
               onClick={() => setTimeframe(tf)}
               className={cn(
-                'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
+                'px-2 sm:px-2.5 py-1 text-xs font-medium rounded-lg transition-colors whitespace-nowrap',
                 timeframe === tf
                   ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                   : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -239,7 +239,7 @@ export function ScreenerTable({
       </div>
 
       {/* 2. Index Universe Switcher Bar (Nifty 50, Bank Nifty, All NSE, F&O, etc.) */}
-      <div className="flex flex-wrap items-center gap-2 pb-1 no-scrollbar">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-1">
         <span className="text-xs font-semibold text-stone-500 dark:text-slate-400 shrink-0 mr-1">
           Universe:
         </span>
@@ -249,7 +249,7 @@ export function ScreenerTable({
             type="button"
             onClick={() => setSelectedIndex(idx)}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight whitespace-nowrap transition-colors',
+              'px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-semibold tracking-tight whitespace-nowrap transition-colors shrink-0',
               selectedIndex === idx
                 ? 'bg-stone-900 text-white dark:bg-slate-800 dark:text-white shadow-xs border border-stone-900 dark:border-slate-700'
                 : 'bg-stone-50 dark:bg-slate-900/80 text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white border border-stone-200 dark:border-slate-800',
@@ -263,7 +263,7 @@ export function ScreenerTable({
       {/* 3. Alphave Preset Boards & Search / Sector Filters */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
         {/* Board Presets */}
-        <div className="flex flex-wrap items-center gap-1.5 pb-1 md:pb-0 no-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-1 md:pb-0 md:flex-wrap">
           {[
             { id: 'all', label: 'All Stocks', icon: SlidersHorizontal },
             { id: 'gainers', label: 'Top Gainers', icon: TrendingUp, color: 'text-emerald-400' },
@@ -277,7 +277,7 @@ export function ScreenerTable({
               type="button"
               onClick={() => setBoardFilter(id as BoardFilter)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all shrink-0',
                 boardFilter === id
                   ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
                   : 'bg-slate-950/60 text-slate-400 hover:text-white border border-slate-900',
@@ -290,9 +290,9 @@ export function ScreenerTable({
         </div>
 
         {/* Search & Sector Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
           {/* Search Box */}
-          <div className="relative min-w-[200px] sm:min-w-[240px]">
+          <div className="relative w-full sm:w-56 md:w-64 min-w-0 flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
             <input
               type="text"
@@ -316,7 +316,7 @@ export function ScreenerTable({
           <select
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="w-full sm:w-auto bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
           >
             {SECTORS.map((sec) => (
               <option key={sec} value={sec}>
@@ -355,7 +355,7 @@ export function ScreenerTable({
               <tr className="bg-slate-950/90 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-800">
                 <th
                   onClick={() => handleSort('ticker')}
-                  className="px-4 py-3 cursor-pointer hover:text-white transition-colors"
+                  className="px-2.5 sm:px-4 py-2 sm:py-3 cursor-pointer hover:text-white transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Company & Stock</span>
@@ -364,7 +364,7 @@ export function ScreenerTable({
                 </th>
                 <th
                   onClick={() => handleSort('price')}
-                  className="px-4 py-3 cursor-pointer hover:text-white transition-colors text-right"
+                  className="px-2.5 sm:px-4 py-2 sm:py-3 cursor-pointer hover:text-white transition-colors text-right"
                 >
                   <div className="flex items-center justify-end gap-1.5">
                     <span>Price</span>
@@ -373,7 +373,7 @@ export function ScreenerTable({
                 </th>
                 <th
                   onClick={() => handleSort('change_pct')}
-                  className="px-4 py-3 cursor-pointer hover:text-white transition-colors text-right"
+                  className="px-2.5 sm:px-4 py-2 sm:py-3 cursor-pointer hover:text-white transition-colors text-right"
                 >
                   <div className="flex items-center justify-end gap-1.5">
                     <span>{timeframe} Return</span>
@@ -399,7 +399,7 @@ export function ScreenerTable({
                     <ArrowUpDown className="w-3 h-3 text-slate-500" />
                   </div>
                 </th>
-                <th className="px-4 py-3 text-right"></th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 dark:divide-slate-800/60 bg-white dark:bg-[#090e18]">
@@ -415,25 +415,25 @@ export function ScreenerTable({
                     className="hover:bg-stone-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
                   >
                     {/* 1. Company & Asset */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <CompanyLogo
                           ticker={s.ticker}
                           name={s.info.name}
                           domain={s.info.domain}
-                          className="w-7 h-7 shadow-xs shrink-0"
+                          className="w-6 h-6 sm:w-7 sm:h-7 shadow-xs shrink-0"
                           size={96}
                         />
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-stone-900 dark:text-white text-sm font-mono group-hover:text-emerald-700 dark:group-hover:text-[#b7eb4d] transition-colors">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <span className="font-semibold text-stone-900 dark:text-white text-xs sm:text-sm font-mono group-hover:text-emerald-700 dark:group-hover:text-[#b7eb4d] transition-colors truncate">
                               {symbol}
                             </span>
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-stone-100 dark:bg-slate-800/80 text-stone-600 dark:text-slate-400 border border-stone-200 dark:border-slate-700/50 hidden sm:inline-block">
                               {s.info.sector}
                             </span>
                           </div>
-                          <div className="text-xs text-stone-500 dark:text-slate-400 truncate max-w-[200px]">
+                          <div className="text-[11px] sm:text-xs text-stone-500 dark:text-slate-400 truncate max-w-[100px] xs:max-w-[140px] sm:max-w-[200px]">
                             {s.info.name}
                           </div>
                         </div>
@@ -441,16 +441,16 @@ export function ScreenerTable({
                     </td>
 
                     {/* 2. Price */}
-                    <td className="px-4 py-3 text-right font-mono font-semibold text-stone-900 dark:text-white text-sm">
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-right font-mono font-semibold text-stone-900 dark:text-white text-xs sm:text-sm whitespace-nowrap">
                       {formatCurrency(s.price, isIndian ? 'INR' : 'USD')}
                     </td>
 
                     {/* 3. Return % Pill & Points */}
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3 text-right whitespace-nowrap">
                       <div className="flex flex-col items-end">
                         <span
                           className={cn(
-                            'inline-flex items-center gap-1 font-semibold text-xs px-2 py-0.5 rounded-md font-mono',
+                            'inline-flex items-center gap-1 font-semibold text-[11px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-md font-mono',
                             isUp
                               ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                               : 'bg-rose-500/10 text-rose-700 dark:text-rose-400',
@@ -505,7 +505,7 @@ export function ScreenerTable({
                     </td>
 
                     {/* 7. Action Button */}
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3 text-right">
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-[#b7eb4d] opacity-80 group-hover:opacity-100 transition-opacity">
                         <span className="hidden sm:inline">SWOT</span>
                         <ChevronRight className="w-4 h-4" />

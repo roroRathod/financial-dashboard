@@ -282,12 +282,12 @@ export function AiEcosystemView({
 
       {/* 3. Sub-View Switcher: Heatmap vs Screener vs Both */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl">
+        <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl overflow-x-auto no-scrollbar max-w-full shrink-0">
           <button
             type="button"
             onClick={() => setViewMode('both')}
             className={cn(
-              'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors',
+              'px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
               viewMode === 'both'
                 ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                 : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -299,7 +299,7 @@ export function AiEcosystemView({
             type="button"
             onClick={() => setViewMode('heatmap')}
             className={cn(
-              'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1',
+              'px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap',
               viewMode === 'heatmap'
                 ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                 : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -312,7 +312,7 @@ export function AiEcosystemView({
             type="button"
             onClick={() => setViewMode('screener')}
             className={cn(
-              'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1',
+              'px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap',
               viewMode === 'screener'
                 ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                 : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -403,10 +403,10 @@ export function AiEcosystemView({
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-stone-50 dark:bg-slate-900/80 text-stone-500 dark:text-slate-400 border-b border-stone-200 dark:border-slate-800 font-semibold text-[11px]">
-                  <th className="py-3 px-3.5">Asset / Company</th>
-                  <th className="py-3 px-3.5">Subsector</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5">Asset / Company</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 hidden sm:table-cell">Subsector</th>
                   <th
-                    className="py-3 px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white"
+                    className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white"
                     onClick={() => {
                       setSortField('price')
                       setSortAsc(!sortAsc)
@@ -418,7 +418,7 @@ export function AiEcosystemView({
                     </div>
                   </th>
                   <th
-                    className="py-3 px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white"
+                    className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white"
                     onClick={() => {
                       setSortField('return')
                       setSortAsc(!sortAsc)
@@ -429,11 +429,11 @@ export function AiEcosystemView({
                       <ArrowUpDown className="w-3 h-3" />
                     </div>
                   </th>
-                  <th className="py-3 px-3.5 text-right hidden sm:table-cell">1D</th>
-                  <th className="py-3 px-3.5 text-right hidden md:table-cell">1M</th>
-                  <th className="py-3 px-3.5 text-right hidden lg:table-cell">YTD</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right hidden sm:table-cell">1D</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right hidden md:table-cell">1M</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right hidden lg:table-cell">YTD</th>
                   <th
-                    className="py-3 px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white hidden xl:table-cell"
+                    className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right cursor-pointer hover:text-stone-900 dark:hover:text-white hidden xl:table-cell"
                     onClick={() => {
                       setSortField('volume')
                       setSortAsc(!sortAsc)
@@ -444,7 +444,7 @@ export function AiEcosystemView({
                       <ArrowUpDown className="w-3 h-3" />
                     </div>
                   </th>
-                  <th className="py-3 px-3.5 text-center">SWOT</th>
+                  <th className="py-2.5 sm:py-3 px-2 sm:px-3.5 text-center">SWOT</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 dark:divide-slate-800/60 bg-white dark:bg-transparent">
@@ -473,45 +473,48 @@ export function AiEcosystemView({
                       className="hover:bg-stone-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
                     >
                       {/* Name & Logo */}
-                      <td className="py-3 px-3.5">
-                        <div className="flex items-center gap-2.5">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5">
+                        <div className="flex items-center gap-2 sm:gap-2.5">
                           <CompanyLogo
                             ticker={stock.ticker}
                             name={stock.name}
-                            className="w-7 h-7 rounded-full shadow-xs"
+                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full shadow-xs shrink-0"
                             size={64}
                           />
-                          <div>
+                          <div className="min-w-0">
                             <div className="font-semibold text-stone-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#b7eb4d] transition-colors flex items-center gap-1.5">
-                              <span>{stock.name}</span>
+                              <span className="truncate max-w-[100px] xs:max-w-[130px] sm:max-w-none text-xs sm:text-sm">{stock.name}</span>
                               {isIndian && (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 font-medium">
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 font-medium shrink-0">
                                   India
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] font-mono text-stone-500 dark:text-slate-400">{stock.ticker}</div>
+                            <div className="text-[10px] sm:text-[11px] font-mono text-stone-500 dark:text-slate-400 flex items-center gap-1.5">
+                              <span>{stock.ticker}</span>
+                              <span className="sm:hidden text-stone-400 dark:text-slate-500">• {stock.sub || stock.category}</span>
+                            </div>
                           </div>
                         </div>
                       </td>
 
                       {/* AI Subsector */}
-                      <td className="py-3 px-3.5">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 hidden sm:table-cell">
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 border border-stone-200 dark:border-slate-700 block max-w-fit">
                           {stock.sub || stock.category}
                         </span>
                       </td>
 
                       {/* Price */}
-                      <td className="py-3 px-3.5 text-right font-mono font-semibold">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono font-semibold whitespace-nowrap text-xs sm:text-sm">
                         {formatCurrency(stock.price, stock.currency || (isIndian ? 'INR' : 'USD'))}
                       </td>
 
                       {/* Timeframe Return */}
-                      <td className="py-3 px-3.5 text-right font-mono font-semibold">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono font-semibold whitespace-nowrap">
                         <span
                           className={cn(
-                            'inline-flex items-center px-2 py-0.5 rounded-md text-xs',
+                            'inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-md text-[11px] sm:text-xs',
                             isUp
                               ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                               : 'bg-rose-500/10 text-rose-700 dark:text-rose-400',

@@ -174,7 +174,7 @@ export function Dashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f7f5ef] dark:bg-[#090d16] text-stone-900 dark:text-slate-100 w-full max-w-full px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 space-y-4 sm:space-y-5 transition-colors duration-150">
+    <div className="min-h-screen bg-[#f7f5ef] dark:bg-[#090d16] text-stone-900 dark:text-slate-100 w-full max-w-full overflow-x-hidden px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 space-y-4 sm:space-y-5 transition-colors duration-150">
       {/* Top Header Bar: Roro Branding, Search Bar, Theme Switcher & Timeframe */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 pb-3 border-b border-stone-200 dark:border-slate-800">
         {/* Brand: roro. rathod */}
@@ -198,16 +198,16 @@ export function Dashboard() {
         </div>
 
         {/* Right Controls: Timeframe Selector, Theme Switcher & Clock */}
-        <div className="flex items-center justify-between lg:justify-end gap-2.5 flex-wrap">
+        <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap w-full lg:w-auto">
           {/* Global Timeframe Chips */}
-          <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-1 rounded-xl overflow-x-auto no-scrollbar">
+          <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-0.5 sm:p-1 rounded-xl overflow-x-auto no-scrollbar max-w-full shrink-0">
             {(['1D', '1W', '1M', '3M', '6M', 'YTD', '1Y'] as Timeframe[]).map((tf) => (
               <button
                 key={tf}
                 type="button"
                 onClick={() => setTimeframe(tf)}
                 className={cn(
-                  'px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
+                  'px-2 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
                   timeframe === tf
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200/80 dark:border-slate-700'
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -223,7 +223,7 @@ export function Dashboard() {
             type="button"
             onClick={toggleAi}
             className={cn(
-              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all',
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all shrink-0',
               aiEnabled
                 ? 'bg-[#b7eb4d]/15 text-[#5e7f17] dark:text-[#b7eb4d] border-[#b7eb4d]/40 hover:bg-[#b7eb4d]/25'
                 : 'bg-white dark:bg-slate-900 text-stone-500 dark:text-slate-400 border-stone-200 dark:border-slate-800 hover:text-stone-700 dark:hover:text-slate-300',
@@ -308,7 +308,7 @@ export function Dashboard() {
       )}
 
       {/* Main Tab Strip: Real Flat Tab Interface (Unslop) */}
-      <nav className="flex items-center gap-1 sm:gap-2 border-b border-stone-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
+      <nav className="flex items-center gap-1 sm:gap-2 border-b border-stone-200 dark:border-slate-800 overflow-x-auto no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -318,13 +318,13 @@ export function Dashboard() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap border-b-2',
+                'flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap border-b-2 shrink-0',
                 isActive
                   ? 'border-[#1b4313] dark:border-[#b7eb4d] text-stone-900 dark:text-white font-semibold'
                   : 'border-transparent text-stone-500 dark:text-slate-400 hover:text-stone-800 dark:hover:text-slate-200 hover:border-stone-300 dark:hover:border-slate-700',
               )}
             >
-              <Icon className={cn('w-4 h-4', isActive ? 'text-[#1b4313] dark:text-[#b7eb4d]' : 'text-stone-400 dark:text-slate-500')} />
+              <Icon className={cn('w-3.5 h-3.5 sm:w-4 sm:h-4', isActive ? 'text-[#1b4313] dark:text-[#b7eb4d]' : 'text-stone-400 dark:text-slate-500')} />
               <span>{tab.label}</span>
             </button>
           )
@@ -337,20 +337,21 @@ export function Dashboard() {
           {/* Region Tabs & Market Grid */}
           <section className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1.5 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl overflow-x-auto no-scrollbar max-w-full shrink-0">
                 {(['INDIA', 'US', 'GLOBAL'] as const).map((reg) => (
                   <button
                     key={reg}
                     type="button"
                     onClick={() => setActiveRegion(reg)}
                     className={cn(
-                      'px-3 py-1 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap',
+                      'px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap',
                       activeRegion === reg
                         ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                         : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
                     )}
                   >
-                    {reg === 'INDIA' ? 'India (NSE / BSE)' : reg === 'US' ? 'United States (NYSE)' : 'Global Markets'}
+                    <span className="hidden sm:inline">{reg === 'INDIA' ? 'India (NSE / BSE)' : reg === 'US' ? 'United States (NYSE)' : 'Global Markets'}</span>
+                    <span className="sm:hidden">{reg === 'INDIA' ? 'India (NSE)' : reg === 'US' ? 'US (NYSE)' : 'Global'}</span>
                   </button>
                 ))}
               </div>
@@ -447,7 +448,7 @@ export function Dashboard() {
                   </div>
                   <span className="text-xs text-stone-500 dark:text-slate-400 font-mono">Spot</span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5">
                   {Object.entries(fx).map(([name, q]: [string, any]) => {
                     const changePct = q.periods?.[timeframe] ?? q.change_pct ?? 0
                     const isUp = changePct >= 0
@@ -465,17 +466,17 @@ export function Dashboard() {
                             volume: q.volume,
                           })
                         }
-                        className="p-3 bg-stone-50 dark:bg-slate-900/60 hover:bg-stone-100 dark:hover:bg-slate-800 border border-stone-200 dark:border-slate-800 rounded-lg text-left transition-colors group"
+                        className="p-2.5 sm:p-3 bg-stone-50 dark:bg-slate-900/60 hover:bg-stone-100 dark:hover:bg-slate-800 border border-stone-200 dark:border-slate-800 rounded-lg text-left transition-colors group"
                       >
-                        <div className="text-xs text-stone-500 dark:text-slate-400 group-hover:text-stone-900 dark:group-hover:text-white font-medium">
+                        <div className="text-xs text-stone-500 dark:text-slate-400 group-hover:text-stone-900 dark:group-hover:text-white font-medium truncate">
                           {name}
                         </div>
-                        <div className="text-base font-bold font-mono text-stone-900 dark:text-white mt-1">
+                        <div className="text-sm sm:text-base font-bold font-mono text-stone-900 dark:text-white mt-1 truncate">
                           {formatCurrency(q.price, q.currency || 'INR')}
                         </div>
                         <div
                           className={cn(
-                            'text-[11px] font-semibold mt-1 font-mono',
+                            'text-[10px] sm:text-[11px] font-semibold mt-1 font-mono truncate',
                             isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400',
                           )}
                         >
@@ -568,9 +569,9 @@ export function Dashboard() {
         <div className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#0e1422] border border-stone-200 dark:border-slate-800 rounded-xl p-4 sm:p-5">
             <div>
-              <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <Coins className="w-5 h-5 text-emerald-600 dark:text-[#b7eb4d]" />
-                Commodities Desk
+                <span>Commodities Desk</span>
                 <span className="text-xs font-normal text-stone-500 dark:text-slate-400">
                   {commodityCurrency === 'INR' ? '— Indian Domestic Buying Rates' : '— International Benchmark Rates'}
                 </span>
@@ -583,12 +584,12 @@ export function Dashboard() {
             </div>
 
             {/* Currency Toggle */}
-            <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-1 rounded-xl self-start sm:self-auto">
+            <div className="flex items-center bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 p-0.5 sm:p-1 rounded-xl self-start sm:self-auto shrink-0">
               <button
                 type="button"
                 onClick={() => setCommodityCurrency('INR')}
                 className={cn(
-                  'px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors',
+                  'px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
                   commodityCurrency === 'INR'
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -600,7 +601,7 @@ export function Dashboard() {
                 type="button"
                 onClick={() => setCommodityCurrency('USD')}
                 className={cn(
-                  'px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors',
+                  'px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap',
                   commodityCurrency === 'USD'
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                     : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',

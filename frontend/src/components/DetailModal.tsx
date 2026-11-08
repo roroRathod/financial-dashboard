@@ -158,37 +158,37 @@ export function DetailModal({
   const isUp = currentChange >= 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl bg-white dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden max-h-[92vh] flex flex-col text-stone-900 dark:text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden max-h-[94vh] flex flex-col text-stone-900 dark:text-slate-100">
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-stone-200 dark:border-slate-800 flex justify-between items-start bg-stone-50/80 dark:bg-[#0e1424]">
-          <div>
-            <div className="flex items-center gap-3">
+        <div className="p-3.5 sm:p-6 border-b border-stone-200 dark:border-slate-800 flex justify-between items-start bg-stone-50/80 dark:bg-[#0e1424]">
+          <div className="min-w-0 flex-1 pr-2">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               <CompanyLogo
                 ticker={asset.ticker}
                 name={asset.name}
-                className="w-9 h-9 rounded-full shadow-sm"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full shadow-sm shrink-0"
                 size={128}
               />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-bold">{asset.name}</h2>
-                  <span className="px-2 py-0.5 text-xs font-mono font-medium bg-stone-200 dark:bg-slate-800 text-stone-700 dark:text-slate-300 rounded border border-stone-300 dark:border-slate-700">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h2 className="text-lg sm:text-2xl font-bold truncate max-w-[170px] xs:max-w-xs sm:max-w-md">{asset.name}</h2>
+                  <span className="px-1.5 sm:px-2 py-0.5 text-xs font-mono font-medium bg-stone-200 dark:bg-slate-800 text-stone-700 dark:text-slate-300 rounded border border-stone-300 dark:border-slate-700 shrink-0">
                     {asset.ticker}
                   </span>
                 </div>
-                {asset.sub && <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">{asset.sub}</p>}
+                {asset.sub && <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5 truncate">{asset.sub}</p>}
               </div>
             </div>
 
-            <div className="flex items-baseline gap-3 mt-3">
-              <span className="text-2xl sm:text-3xl font-bold font-mono">
+            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3">
+              <span className="text-xl sm:text-3xl font-bold font-mono">
                 {formatCurrency(asset.price, asset.currency || 'INR')}
-                {asset.unit && <span className="text-sm font-normal text-stone-500 dark:text-slate-400 ml-1.5">{asset.unit}</span>}
+                {asset.unit && <span className="text-xs sm:text-sm font-normal text-stone-500 dark:text-slate-400 ml-1.5">{asset.unit}</span>}
               </span>
               <span
                 className={cn(
-                  'flex items-center text-xs sm:text-sm font-semibold px-2.5 py-0.5 rounded-lg font-mono',
+                  'flex items-center text-xs sm:text-sm font-semibold px-2 sm:px-2.5 py-0.5 rounded-lg font-mono',
                   isUp
                     ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
                     : 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20',
@@ -202,36 +202,36 @@ export function DetailModal({
 
           <button
             onClick={onClose}
-            className="p-2 text-stone-400 hover:text-stone-800 dark:hover:text-white rounded-lg hover:bg-stone-200/60 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 sm:p-2 text-stone-400 hover:text-stone-800 dark:hover:text-white rounded-lg hover:bg-stone-200/60 dark:hover:bg-slate-800 transition-colors shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-5">
+        <div className="p-3.5 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5">
           {/* Chart Controls: Candlestick vs Area + Timeframe */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
             {/* View Switcher: Candlestick vs Line Area */}
-            <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl self-start sm:self-auto">
+            <div className="flex items-center gap-1 p-0.5 sm:p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl self-start sm:self-auto overflow-x-auto no-scrollbar max-w-full shrink-0">
               <button
                 type="button"
                 onClick={() => setChartType('candle')}
                 className={cn(
-                  'px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5',
+                  'px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap',
                   chartType === 'candle'
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-sm border border-stone-200 dark:border-slate-700'
                     : 'text-stone-500 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
                 )}
               >
                 <BarChart2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#b7eb4d]" />
-                <span>Candlesticks (OHLC)</span>
+                <span>Candlesticks</span>
               </button>
               <button
                 type="button"
                 onClick={() => setChartType('area')}
                 className={cn(
-                  'px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5',
+                  'px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap',
                   chartType === 'area'
                     ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-sm border border-stone-200 dark:border-slate-700'
                     : 'text-stone-500 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -243,13 +243,13 @@ export function DetailModal({
             </div>
 
             {/* Timeframe Chips */}
-            <div className="flex items-center gap-1 bg-stone-100 dark:bg-slate-900 p-1 rounded-xl border border-stone-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 bg-stone-100 dark:bg-slate-900 p-0.5 sm:p-1 rounded-xl border border-stone-200 dark:border-slate-800 overflow-x-auto no-scrollbar max-w-full shrink-0">
               {['1D', '1W', '1M', '3M', '6M', 'YTD', '1Y'].map((tf) => (
                 <button
                   key={tf}
                   onClick={() => setTimeframe(tf)}
                   className={cn(
-                    'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
+                    'px-2 sm:px-2.5 py-1 text-xs font-medium rounded-lg transition-colors whitespace-nowrap',
                     timeframe === tf
                       ? 'bg-stone-900 text-white dark:bg-slate-800 dark:text-white shadow-sm'
                       : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -321,39 +321,39 @@ export function DetailModal({
           )}
 
           {/* Session Statistics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3">
               <span className="text-[11px] text-stone-500 dark:text-slate-400 block font-medium">Day High</span>
-              <span className="text-sm font-semibold font-mono mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold font-mono mt-1 block truncate">
                 {asset.high ? formatCurrency(asset.high, asset.currency || 'INR') : '—'}
               </span>
             </div>
-            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-3">
+            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3">
               <span className="text-[11px] text-stone-500 dark:text-slate-400 block font-medium">Day Low</span>
-              <span className="text-sm font-semibold font-mono mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold font-mono mt-1 block truncate">
                 {asset.low ? formatCurrency(asset.low, asset.currency || 'INR') : '—'}
               </span>
             </div>
-            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-3">
+            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3">
               <span className="text-[11px] text-stone-500 dark:text-slate-400 block font-medium">Open</span>
-              <span className="text-sm font-semibold font-mono mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold font-mono mt-1 block truncate">
                 {asset.open ? formatCurrency(asset.open, asset.currency || 'INR') : '—'}
               </span>
             </div>
-            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-3">
+            <div className="bg-stone-50 dark:bg-slate-900/60 border border-stone-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3">
               <span className="text-[11px] text-stone-500 dark:text-slate-400 block font-medium">Volume</span>
-              <span className="text-sm font-semibold font-mono mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold font-mono mt-1 block truncate">
                 {asset.volume ? asset.volume.toLocaleString('en-IN') : '—'}
               </span>
             </div>
           </div>
 
           {/* Reason For Move Card */}
-          <div className="bg-stone-50 dark:bg-[#0e1726] border border-stone-200 dark:border-slate-800 rounded-xl p-4 sm:p-5">
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-200 dark:border-slate-800">
+          <div className="bg-stone-50 dark:bg-[#0e1726] border border-stone-200 dark:border-slate-800 rounded-xl p-3.5 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-stone-200 dark:border-slate-800">
               <div className="flex flex-wrap items-center gap-2">
                 <Sparkles className={cn('w-4 h-4', aiEnabled ? 'text-emerald-600 dark:text-[#b7eb4d]' : 'text-stone-400')} />
-                <h3 className="font-semibold text-sm">Reason For Move ({timeframe})</h3>
+                <h3 className="font-semibold text-xs sm:text-sm">Reason For Move ({timeframe})</h3>
                 {aiData?.source && (
                   <span className="text-[10px] px-2 py-0.5 rounded-md font-mono bg-stone-200/80 dark:bg-slate-800 text-stone-600 dark:text-slate-400 border border-stone-300/60 dark:border-slate-700/60">
                     {aiData.source}

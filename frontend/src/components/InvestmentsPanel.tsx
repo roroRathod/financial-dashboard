@@ -224,9 +224,9 @@ export function InvestmentsPanel() {
   const isProfitable = totalProfitLoss >= 0
 
   return (
-    <div className="bg-white dark:bg-[#0e1422] border border-stone-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs text-stone-900 dark:text-slate-100 space-y-5">
+    <div className="bg-white dark:bg-[#0e1422] border border-stone-200 dark:border-slate-800 rounded-2xl p-3 sm:p-6 shadow-xs text-stone-900 dark:text-slate-100 space-y-4 sm:space-y-5 max-w-full">
       {/* 1. Header with Portfolio Totals & View Toggle */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-slate-800">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-stone-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base sm:text-lg font-bold">Portfolio & Watchlist Desk</h2>
@@ -240,12 +240,12 @@ export function InvestmentsPanel() {
         </div>
 
         {/* View Switcher: Portfolio vs Watchlist */}
-        <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl self-start lg:self-auto">
+        <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl self-start lg:self-auto overflow-x-auto no-scrollbar max-w-full shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('portfolio')}
             className={cn(
-              'px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5',
+              'px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap',
               activeTab === 'portfolio'
                 ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                 : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -258,7 +258,7 @@ export function InvestmentsPanel() {
             type="button"
             onClick={() => setActiveTab('watchlist')}
             className={cn(
-              'px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5',
+              'px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap',
               activeTab === 'watchlist'
                 ? 'bg-white dark:bg-slate-800 text-stone-900 dark:text-white shadow-xs border border-stone-200 dark:border-slate-700'
                 : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
@@ -313,13 +313,13 @@ export function InvestmentsPanel() {
       )}
 
       {/* 3. Semantic Search Add-Holding Form with Compulsory Field Badges */}
-      <div className="bg-stone-50/80 dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 space-y-3">
-        <div className="flex items-center justify-between">
+      <div className="bg-stone-50/80 dark:bg-[#0b101b] border border-stone-200 dark:border-slate-800 rounded-xl p-3.5 sm:p-5 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3">
           <span className="text-xs font-semibold text-stone-800 dark:text-slate-200">
             Add Holding or Watchlist Asset
           </span>
           {/* Field Compulsory Guidance */}
-          <div className="flex items-center gap-3 text-[11px]">
+          <div className="flex items-center gap-2 sm:gap-3 text-[11px] flex-wrap">
             <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
               1. Asset: Compulsory
@@ -327,12 +327,12 @@ export function InvestmentsPanel() {
             <span className="text-stone-400 dark:text-slate-500 hidden sm:inline">|</span>
             <span className="flex items-center gap-1 text-stone-500 dark:text-slate-400">
               <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
-              2. Price: Optional (defaults to live price)
+              2. Price: Optional
             </span>
             <span className="text-stone-400 dark:text-slate-500 hidden md:inline">|</span>
             <span className="flex items-center gap-1 text-stone-500 dark:text-slate-400 hidden md:flex">
               <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
-              3. Qty: Optional (defaults to 1)
+              3. Qty: Optional
             </span>
           </div>
         </div>
@@ -414,9 +414,10 @@ export function InvestmentsPanel() {
           <div className="sm:col-span-1">
             <button
               type="submit"
-              className="w-full h-full py-2 bg-stone-900 hover:bg-stone-800 dark:bg-[#b7eb4d] dark:hover:bg-[#a5d840] text-white dark:text-[#0b101b] rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
+              className="w-full py-2.5 sm:py-2 bg-stone-900 hover:bg-stone-800 dark:bg-[#b7eb4d] dark:hover:bg-[#a5d840] text-white dark:text-[#0b101b] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
             >
               <Plus className="w-4 h-4" />
+              <span className="sm:hidden">Add Holding</span>
             </button>
           </div>
         </form>
@@ -427,17 +428,17 @@ export function InvestmentsPanel() {
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="bg-stone-50 dark:bg-slate-900/80 text-stone-500 dark:text-slate-400 border-b border-stone-200 dark:border-slate-800 font-semibold text-[11px]">
-              <th className="py-3 px-3.5">Asset / Holding</th>
-              <th className="py-3 px-3.5 text-right">Live Price</th>
+              <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5">Asset / Holding</th>
+              <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right">Live Price</th>
               {activeTab === 'portfolio' && (
                 <>
-                  <th className="py-3 px-3.5 text-right">Avg Buy Price</th>
-                  <th className="py-3 px-3.5 text-right">Units</th>
-                  <th className="py-3 px-3.5 text-right">Current Value</th>
-                  <th className="py-3 px-3.5 text-right">P&L Gain/Loss</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right hidden sm:table-cell">Avg Buy Price</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right hidden sm:table-cell">Units</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right">Current Value</th>
+                  <th className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right">P&L Gain/Loss</th>
                 </>
               )}
-              <th className="py-3 px-3.5 text-center w-12">Action</th>
+              <th className="py-2.5 sm:py-3 px-2 sm:px-3.5 text-center w-10 sm:w-12">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100 dark:divide-slate-800/60 bg-white dark:bg-transparent">
@@ -456,42 +457,47 @@ export function InvestmentsPanel() {
                   className="hover:bg-stone-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
                   {/* Asset */}
-                  <td className="py-3 px-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <CompanyLogo ticker={item.ticker} name={item.name} className="w-7 h-7 rounded-full shadow-xs" size={64} />
-                      <div>
-                        <div className="font-semibold text-stone-900 dark:text-white font-mono">{cleanSymbol(item.ticker)}</div>
-                        <div className="text-[11px] text-stone-500 dark:text-slate-400 truncate max-w-[140px] sm:max-w-xs">
+                  <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5">
+                    <div className="flex items-center gap-2 sm:gap-2.5">
+                      <CompanyLogo ticker={item.ticker} name={item.name} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full shadow-xs shrink-0" size={64} />
+                      <div className="min-w-0">
+                        <div className="font-semibold text-stone-900 dark:text-white font-mono text-xs sm:text-sm">{cleanSymbol(item.ticker)}</div>
+                        <div className="text-[10px] sm:text-[11px] text-stone-500 dark:text-slate-400 truncate max-w-[100px] xs:max-w-[130px] sm:max-w-xs">
                           {item.name}
                         </div>
+                        {activeTab === 'portfolio' && (
+                          <div className="text-[10px] font-mono text-stone-400 dark:text-slate-500 sm:hidden">
+                            {item.qty} units @ {formatCurrency(item.avg_price, isIndian ? 'INR' : 'USD')}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
 
                   {/* Live Price */}
-                  <td className="py-3 px-3.5 text-right font-mono font-semibold text-stone-900 dark:text-white">
+                  <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono font-semibold text-stone-900 dark:text-white whitespace-nowrap text-xs sm:text-sm">
                     {formatCurrency(liveP, isIndian ? 'INR' : 'USD')}
                   </td>
 
                   {activeTab === 'portfolio' && (
                     <>
                       {/* Avg Buy Price */}
-                      <td className="py-3 px-3.5 text-right font-mono text-stone-600 dark:text-slate-300">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono text-stone-600 dark:text-slate-300 hidden sm:table-cell whitespace-nowrap">
                         {formatCurrency(item.avg_price, isIndian ? 'INR' : 'USD')}
                       </td>
 
                       {/* Units */}
-                      <td className="py-3 px-3.5 text-right font-mono text-stone-700 dark:text-slate-300">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono text-stone-700 dark:text-slate-300 hidden sm:table-cell">
                         {item.qty}
                       </td>
 
                       {/* Current Value */}
-                      <td className="py-3 px-3.5 text-right font-mono font-semibold text-stone-900 dark:text-white">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono font-semibold text-stone-900 dark:text-white whitespace-nowrap text-xs sm:text-sm">
                         {formatCurrency(currVal, isIndian ? 'INR' : 'USD')}
                       </td>
 
                       {/* P&L */}
-                      <td className="py-3 px-3.5 text-right font-mono font-semibold">
+                      <td className="py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-right font-mono font-semibold whitespace-nowrap text-xs sm:text-sm">
                         <div className={isItemUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                           {isItemUp ? '+' : ''}
                           {formatCurrency(pl, isIndian ? 'INR' : 'USD')}
@@ -504,7 +510,7 @@ export function InvestmentsPanel() {
                   )}
 
                   {/* Delete Button */}
-                  <td className="py-3 px-3.5 text-center">
+                  <td className="py-2.5 sm:py-3 px-2 sm:px-3.5 text-center">
                     <button
                       type="button"
                       onClick={() => handleDelete(item.ticker)}
