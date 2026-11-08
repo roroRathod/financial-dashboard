@@ -32,6 +32,8 @@ type DetailModalProps = {
     volume?: number
     unit?: string
     sub?: string
+    karats?: Record<string, any>
+    benchmark?: string
   } | null
   onClose: () => void
   initialTimeframe?: string
@@ -48,12 +50,23 @@ export function DetailModal({
 }: DetailModalProps) {
   const [timeframe, setTimeframe] = useState(initialTimeframe)
   const [chartType, setChartType] = useState<'area' | 'candle'>('candle')
+  const [selectedKarat, setSelectedKarat] = useState<'24K' | '22K' | '18K'>('24K')
   const [historyData, setHistoryData] = useState<any[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
   const [aiData, setAiData] = useState<any>(null)
   const [aiLoading, setAiLoading] = useState(false)
   const [candlestickAi, setCandlestickAi] = useState<any>(null)
   const [candleAiLoading, setCandleAiLoading] = useState(false)
+
+  const activePrice =
+    asset?.currency === 'INR' && asset?.karats && asset.karats[selectedKarat]
+      ? asset.karats[selectedKarat].price_per_g
+      : asset?.price ?? 0
+
+  const activeSub =
+    asset?.currency === 'INR' && asset?.karats && asset.karats[selectedKarat]
+      ? asset.karats[selectedKarat].sub
+      : asset?.sub
 
   useEffect(() => {
     if (!asset) return
@@ -177,13 +190,40 @@ export function DetailModal({
                     {asset.ticker}
                   </span>
                 </div>
-                {asset.sub && <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5 truncate">{asset.sub}</p>}
+                {activeSub && <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5 truncate">{activeSub}</p>}
               </div>
             </div>
 
+            {/* Karat selector for Indian gold pricing in modal */}
+            {asset.currency === 'INR' && asset.karats && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2.5 p-1 bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-xl w-fit">
+                <span className="text-[11px] font-semibold text-stone-500 dark:text-slate-400 px-1.5">Purity:</span>
+                {(['24K', '22K', '18K'] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setSelectedKarat(k)}
+                    className={cn(
+                      'px-2.5 py-0.5 text-xs font-bold rounded-lg transition-colors',
+                      selectedKarat === k
+                        ? 'bg-amber-500 text-stone-950 dark:bg-amber-400 dark:text-stone-950 shadow-xs'
+                        : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white',
+                    )}
+                  >
+                    {k}
+                  </button>
+                ))}
+                {asset.karats[selectedKarat] && (
+                  <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400 px-1.5 hidden xs:inline">
+                    {asset.karats[selectedKarat].purity}
+                  </span>
+                )}
+              </div>
+            )}
+
             <div className="flex flex-wrap items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3">
               <span className="text-xl sm:text-3xl font-bold font-mono">
-                {formatCurrency(asset.price, asset.currency || 'INR')}
+                {formatCurrency(activePrice, asset.currency || 'INR')}
                 {asset.unit && <span className="text-xs sm:text-sm font-normal text-stone-500 dark:text-slate-400 ml-1.5">{asset.unit}</span>}
               </span>
               <span

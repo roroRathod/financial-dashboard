@@ -578,7 +578,7 @@ export function Dashboard() {
               </h2>
               <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">
                 {commodityCurrency === 'INR'
-                  ? 'Calculated in domestic consumer units (per 10g Gold, per 1kg Silver, per Gallon Fuel) factoring import duty (15%) + GST (3%) + spot USDINR.'
+                  ? 'Domestic spot rates sourced live from India Bullion and Jewellers Association (IBJA, Mumbai Zaveri Bazar). Toggle 24K, 22K, or 18K for real-time purity rates.'
                   : 'Benchmark international commodity futures in standard COMEX/NYMEX trading units ($/oz, $/lb, $/barrel, $/tonne).'}
               </p>
             </div>
@@ -632,6 +632,7 @@ export function Dashboard() {
                 }}
                 inrData={c.inr}
                 usdData={c.usd}
+                karats={c.karats || c.inr?.karats}
                 currencyMode={commodityCurrency}
                 timeframe={timeframe}
                 onClick={() =>
@@ -647,6 +648,8 @@ export function Dashboard() {
                     low: c.low,
                     open: c.open,
                     volume: c.volume,
+                    karats: commodityCurrency === 'INR' ? (c.karats || c.inr?.karats) : undefined,
+                    benchmark: c.benchmark || c.inr?.benchmark,
                   })
                 }
               />
